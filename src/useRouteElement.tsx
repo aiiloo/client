@@ -2,8 +2,7 @@ import { Navigate, Outlet, useRoutes } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
 import Home from './pages/Home'
 import RegisterLayout from './layouts/RegisterLayout'
-import Login from './pages/Login/Login'
-import Register from './pages/Register'
+import Authenticate from './pages/Authenticate/Authenticate'
 
 function ProtectedRoute() {
   const isAuthenticated = false
@@ -27,14 +26,6 @@ export default function useRouteElement() {
               <Home />
             </MainLayout>
           )
-        },
-        {
-          path: '/time-line',
-          element: (
-            <MainLayout>
-              <Home />
-            </MainLayout>
-          )
         }
       ]
     },
@@ -43,18 +34,10 @@ export default function useRouteElement() {
       element: <RejectedRoute />,
       children: [
         {
-          path: '/login',
+          path: '/authenticate',
           element: (
             <RegisterLayout>
-              <Login />
-            </RegisterLayout>
-          )
-        },
-        {
-          path: '/register',
-          element: (
-            <RegisterLayout>
-              <Register />
+              <Authenticate />
             </RegisterLayout>
           )
         }
