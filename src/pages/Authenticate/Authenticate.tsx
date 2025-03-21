@@ -93,7 +93,7 @@ export default function Authenticate() {
               </p>
             </div>
 
-            <p className='mt-8'>
+            <div className='mt-8'>
               Already have an account?{' '}
               <div>
                 <button
@@ -103,7 +103,7 @@ export default function Authenticate() {
                   Sign in
                 </button>
               </div>
-            </p>
+            </div>
           </div>
         </div>
         <footer className='text-gray-500 text-xs text-center py-4'>
@@ -166,7 +166,6 @@ export default function Authenticate() {
         {showModalRegister && <RegisterForm setShowModal={setshowModalRegister} />}
         {showModalLogin && <LoginForm setShowModal={setshowModalLogin} />}
       </div>
-     
     </>
   )
 }
