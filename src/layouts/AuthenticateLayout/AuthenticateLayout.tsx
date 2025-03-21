@@ -1,6 +1,6 @@
 interface Props {
   children: React.ReactNode
 }
-export default function RegisterLayout({ children }: Props) {
+export default function AuthenticateLayout({ children }: Props) {
   return <div>{children}</div>
 }
