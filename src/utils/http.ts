@@ -33,9 +33,9 @@ class Http {
     this.instance.interceptors.response.use(
       (response) => {
         const { url } = response.config
-        if (url === '/users/login' || url === '/users/register') {
-          this.accessToken = response.data.access_token
-          this.refreshToken = response.data.refresh_token
+        if (url === '/users/login' || url === '/users/verify-email') {
+          this.accessToken = response.data.data.access_token
+          this.refreshToken = response.data.data.refresh_token
           setTokenToLS(this.accessToken, this.refreshToken)
         }
         return response
