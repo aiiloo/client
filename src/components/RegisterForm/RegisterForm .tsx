@@ -10,6 +10,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useNavigate } from 'react-router-dom'
 import Spinner from '../Spinner'
 import Button from '../Button'
+import { isAxiosBadRequestError } from '../../utils/utils'
+import { ErrorResponse, ValidationErrors } from '../../types/utils.type'
 
 interface Props {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>
@@ -48,7 +50,7 @@ export default function RegisterForm({ setShowModal }: Props) {
     }
 
     registerMutation.mutate(dataSubmit, {
-      onSuccess: (data) => {
+      onSuccess: () => {
         setIsShowSpinner(true)
         setTimeout(() => {
           setIsShowSpinner(false)
@@ -57,6 +59,12 @@ export default function RegisterForm({ setShowModal }: Props) {
       },
       onError: (error) => {
         console.log('error', error)
+        if (isAxiosBadRequestError<ErrorResponse<ValidationErrors>>(error)) {
+          setError('email', {
+            type: 'custom',
+            message: error.response?.data.errors?.email?.msg
+          })
+        }
       }
     })
   })
@@ -93,7 +101,6 @@ export default function RegisterForm({ setShowModal }: Props) {
             </div>
           </div> */}
 
-            {/* Tiêu đề */}
             <h2 className='text-2xl font-bold text-center'>Create Your Account</h2>
 
             <form className='mt-4' onSubmit={onSubmit}>

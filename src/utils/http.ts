@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios'
 import config from '../constants/config'
-import { setTokenToLS } from './auth'
+import { setProfileToLs, setTokenToLS } from './auth'
 
 class Http {
   instance: AxiosInstance
@@ -37,6 +37,7 @@ class Http {
           this.accessToken = response.data.data.access_token
           this.refreshToken = response.data.data.refresh_token
           setTokenToLS(this.accessToken, this.refreshToken)
+          setProfileToLs(response.data.data.user)
         }
         return response
       },

@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { User } from '../types/user.type'
+import { getAccessTokenFromLS, getProfileFromLS } from '../utils/auth'
 
 interface UserState {
   currentUser: User | null
@@ -7,10 +8,8 @@ interface UserState {
 }
 
 const initialState: UserState = {
-  currentUser: null,
-  isAuthenticated: false
-  //   currentUser: getProfileFromLS() || null,
-  //   isAuthenticated: Boolean(getAccessTokenFromLS())
+  currentUser: getProfileFromLS() || null,
+  isAuthenticated: Boolean(getAccessTokenFromLS())
 }
 
 const userSlice = createSlice({

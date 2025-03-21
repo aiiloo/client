@@ -6,16 +6,18 @@ import Authenticate from './pages/Authenticate/Authenticate'
 import EmailVerifyLayout from './layouts/EmailVerifyLayout'
 import PendingVerify from './pages/PendingVerify'
 import EmailVerify from './pages/EmailVerify'
+import { RootState } from './store'
+import { useSelector } from 'react-redux'
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute() {
-  const isAuthenticated = false
+  const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated)
   return isAuthenticated ? <Outlet /> : <Navigate to='/authenticate' />
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 function RejectedRoute() {
-  const isAuthenticated = false
+  const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated)
   return !isAuthenticated ? <Outlet /> : <Navigate to='/' />
 }
 export default function useRouteElement() {
