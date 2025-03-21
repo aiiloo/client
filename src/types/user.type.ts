@@ -6,3 +6,7 @@ export interface User {
   createdAt: string
   updatedAt: string
 }
+
+export interface EmailVerify {
+  email_verify_token: string
+}
