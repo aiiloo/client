@@ -3,11 +3,12 @@ import MainLayout from './layouts/MainLayout'
 import Home from './pages/Home'
 import AuthenticateLayout from './layouts/AuthenticateLayout'
 import Authenticate from './pages/Authenticate/Authenticate'
-import EmailVerifyLayout from './layouts/EmailVerifyLayout'
+import VerifyLayout from './layouts/VerifyLayout'
 import PendingVerify from './pages/PendingVerify'
 import EmailVerify from './pages/EmailVerify'
 import { RootState } from './store'
 import { useSelector } from 'react-redux'
+import GoogleAuth from './pages/GoogleOauth'
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute() {
@@ -57,9 +58,9 @@ export default function useRouteElement() {
         {
           path: '/email-verify',
           element: (
-            <EmailVerifyLayout>
+            <VerifyLayout>
               <EmailVerify />
-            </EmailVerifyLayout>
+            </VerifyLayout>
           )
         }
       ]
@@ -71,9 +72,23 @@ export default function useRouteElement() {
         {
           path: '/pending-verify',
           element: (
-            <EmailVerifyLayout>
+            <VerifyLayout>
               <PendingVerify />
-            </EmailVerifyLayout>
+            </VerifyLayout>
+          )
+        }
+      ]
+    },
+    {
+      path: '',
+      element: <RejectedRoute />,
+      children: [
+        {
+          path: '/google/oauth',
+          element: (
+            <VerifyLayout>
+              <GoogleAuth />
+            </VerifyLayout>
           )
         }
       ]

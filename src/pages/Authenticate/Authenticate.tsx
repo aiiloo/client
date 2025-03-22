@@ -1,10 +1,15 @@
 import { useState } from 'react'
 import RegisterForm from '../../components/RegisterForm'
 import LoginForm from '../../components/LoginForm'
+import { getGoogleAuthUrl } from '../../utils/auth'
 
 export default function Authenticate() {
   const [showModalRegister, setshowModalRegister] = useState(false)
   const [showModalLogin, setshowModalLogin] = useState(false)
+
+  const openGoogleLogin = () => {
+    window.location.href = getGoogleAuthUrl()
+  }
   return (
     <>
       <div className='bg-black text-white flex flex-col justify-between min-h-screen'>
@@ -22,7 +27,10 @@ export default function Authenticate() {
             <h1 className='text-4xl md:text-5xl font-bold'>Happening now</h1>
             <p className='text-2xl md:text-3xl font-semibold mt-4'>Join today.</p>
             <div className='mt-8 space-y-4 w-full flex flex-col items-center md:items-start'>
-              <button className='w-full max-w-xs bg-white text-black py-2 px-4 rounded-full flex items-center justify-center border border-gray-300 shadow-sm hover:bg-gray-100 transition'>
+              <button
+                onClick={openGoogleLogin}
+                className='w-full max-w-xs bg-white text-black py-2 px-4 rounded-full flex items-center justify-center border border-gray-300 shadow-sm hover:bg-gray-100 transition'
+              >
                 <svg
                   className='w-5 h-5 mr-2'
                   xmlns='http://www.w3.org/2000/svg'
