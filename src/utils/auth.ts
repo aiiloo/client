@@ -13,6 +13,10 @@ export const getAccessTokenFromLS = () => {
   return localStorage.getItem('accessToken')
 }
 
+export const getRefreshTokenFromLS = () => {
+  return localStorage.getItem('refreshToken')
+}
+
 export const getProfileFromLS = () => {
   return JSON.parse(localStorage.getItem('profile') || '{}')
 }
