@@ -41,11 +41,11 @@ export default function LoginForm(props: Props) {
     loginMutation.mutate(data, {
       onSuccess: (response) => {
         setIsLoading(true)
-        dispatch(loginSuccess(response.data.data.user))
         setTimeout(() => {
           setIsLoading(false)
           setShowSuccess(true)
           setTimeout(() => {
+            dispatch(loginSuccess(response.data.data.user))
             navigate('/')
           }, 1000)
         }, 1000)
@@ -138,7 +138,7 @@ export default function LoginForm(props: Props) {
             transition={{ duration: 0.5 }}
             className='fixed top-10 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg'
           >
-            🎉 Đăng nhập thành công!
+            🎉 Login successfully!
           </motion.div>
         )}
       </div>

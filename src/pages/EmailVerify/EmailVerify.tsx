@@ -1,25 +1,48 @@
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import userApi from '../../apis/user.api'
 import Spinner from '../../components/Spinner'
+import { useAppDispatch } from '../../store'
+import { loginSuccess } from '../../store/user.slice'
+import { getProfileFromLS } from '../../utils/auth'
+import { User } from '../../types/user.type'
+
+const initialUserData: User = {
+  avatar: '',
+  bio: '',
+  cover_photo: '',
+  created_at: '',
+  date_of_birth: '',
+  email: '',
+  location: '',
+  name: '',
+  updated_at: '',
+  username: '',
+  verify: false,
+  website: '',
+  _id: ''
+}
 
 export default function EmailVerify() {
   const [searchParams] = useSearchParams()
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const [isShowSpinner, setIsShowSpinner] = useState(false)
-
+  const [userData, setUserData] = useState<User>(initialUserData)
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const email_verify_token = searchParams.get('token') || ''
-
   useEffect(() => {
     setIsShowSpinner(true)
     if (email_verify_token) {
       setStatus('loading')
       userApi
         .verify({ email_verify_token })
-        .then((data) => {
+        .then(() => {
           setStatus('success')
-          console.log(data)
+          // console.log(data)
+          const user = getProfileFromLS()
+          setUserData(user)
         })
         .catch((error) => {
           console.error(error)
@@ -31,6 +54,13 @@ export default function EmailVerify() {
       setIsShowSpinner(false)
     }, 1000)
   }, [email_verify_token])
+
+  const handleNavigateToHome = () => {
+    setIsShowSpinner(true)
+    setTimeout(() => {
+      dispatch(loginSuccess(userData))
+    }, 1000)
+  }
 
   return (
     <div className='flex items-center justify-center min-h-screen bg-black'>
@@ -57,9 +87,9 @@ export default function EmailVerify() {
           </div>
           <h2 className='text-xl font-semibold mb-2'>Verification Success</h2>
           <p className='text-white mb-4'>Your email has been successfully verified</p>
-          <Link to='/' className='text-white font-semibold'>
+          <button onClick={handleNavigateToHome} className='text-white font-semibold'>
             TAKE ME HOME &gt;&gt;
-          </Link>
+          </button>
         </div>
       )}
       {!isShowSpinner && status === 'error' && (
