@@ -21,3 +21,7 @@ export interface EmailVerify {
 export interface LogoutType {
   refresh_token: string
 }
+
+export interface RefreshTokenType {
+  refresh_token: string
+}

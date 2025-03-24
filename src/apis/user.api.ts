@@ -1,5 +1,5 @@
 import { AuthResponse } from '../types/auth.type'
-import { EmailVerify, LogoutType } from '../types/user.type'
+import { EmailVerify, LogoutType, RefreshTokenType } from '../types/user.type'
 import http from '../utils/http'
 import { LoginType, RegisterType } from '../utils/rules'
 
@@ -17,6 +17,9 @@ const userApi = {
 
   logout(body: LogoutType) {
     return http.post('/users/logout', body)
+  },
+  refresh(body: RefreshTokenType) {
+    return http.post('/users/refresh-token', body)
   }
 }
 
