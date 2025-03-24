@@ -201,7 +201,7 @@ export default function LeftSidebar() {
       <span>Premium</span>
     </a> */}
 
-          <a className='flex items-center space-x-8 text-xl' href='#'>
+          <a className='flex items-center space-x-8 text-xl' href='/myProfile'>
             <svg
               className='w-6 h-6 text-gray-800 dark:text-white'
               aria-hidden='true'
