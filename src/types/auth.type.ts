@@ -16,3 +16,10 @@ export type AuthGoogleResponse = {
   }
   user: User
 }
+
+export type RefreshTokenReponse = {
+  data: {
+    access_token: string
+    refresh_token: string
+  }
+}

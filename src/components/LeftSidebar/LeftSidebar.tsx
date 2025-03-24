@@ -34,7 +34,7 @@ export default function LeftSidebar() {
       }
     )
   }
-  console.log('user: ', user)
+  // console.log('user: ', user)
   return (
     <>
       <div className='hidden lg:block w-[20%] bg-black p-4 space-y-4 absolute md:left-20 top-0 h-full '>
