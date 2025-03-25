@@ -17,7 +17,7 @@ export default function LeftSidebar() {
   })
 
   const handleLogout = () => {
-    const refeshToken = getRefreshTokenFromLS() as string
+    let refeshToken = getRefreshTokenFromLS() || ''
     logoutMutation.mutate(
       { refresh_token: refeshToken },
       {
@@ -26,11 +26,12 @@ export default function LeftSidebar() {
           dispatch(setLoading(true))
           setTimeout(() => {
             dispatch(setLoading(false))
-
             dispatch(logOut())
           }, 1000)
         },
-        onError: () => {}
+        onError: () => {
+          refeshToken = getRefreshTokenFromLS() || ''
+        }
       }
     )
   }

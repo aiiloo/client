@@ -9,6 +9,7 @@ import EmailVerify from './pages/EmailVerify'
 import { RootState } from './store'
 import { useSelector } from 'react-redux'
 import GoogleAuth from './pages/GoogleOauth'
+import Message from './pages/Message'
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute() {
@@ -32,6 +33,14 @@ export default function useRouteElement() {
           element: (
             <MainLayout>
               <Home />
+            </MainLayout>
+          )
+        },
+        {
+          path: '/message',
+          element: (
+            <MainLayout>
+              <Message />
             </MainLayout>
           )
         }
