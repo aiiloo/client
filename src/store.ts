@@ -2,11 +2,13 @@ import { configureStore } from '@reduxjs/toolkit'
 import userReducer from './store/user.slice'
 import { useDispatch } from 'react-redux'
 import spinnerReducer from './store/spinner.slice'
+import selectedUserReducer from './store/selectedUserSlice'
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
-    spinner: spinnerReducer
+    spinner: spinnerReducer,
+    selectedUser: selectedUserReducer
   }
 })
 
