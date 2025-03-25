@@ -17,7 +17,7 @@ export default function LeftSidebar() {
   })
 
   const handleLogout = () => {
-    const refeshToken = getRefreshTokenFromLS() as string
+    let refeshToken = getRefreshTokenFromLS() || ''
     logoutMutation.mutate(
       { refresh_token: refeshToken },
       {
@@ -26,11 +26,12 @@ export default function LeftSidebar() {
           dispatch(setLoading(true))
           setTimeout(() => {
             dispatch(setLoading(false))
-
             dispatch(logOut())
           }, 1000)
         },
-        onError: () => {}
+        onError: () => {
+          refeshToken = getRefreshTokenFromLS() || ''
+        }
       }
     )
   }
@@ -201,7 +202,7 @@ export default function LeftSidebar() {
       <span>Premium</span>
     </a> */}
 
-          <a className='flex items-center space-x-8 text-xl' href='#'>
+          <a className='flex items-center space-x-8 text-xl' href='/myProfile'>
             <svg
               className='w-6 h-6 text-gray-800 dark:text-white'
               aria-hidden='true'

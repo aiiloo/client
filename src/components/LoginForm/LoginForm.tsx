@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 import Button from '../Button'
 import { ErrorResponse, ValidationErrors } from '../../types/utils.type'
-import { isAxiosBadRequestError } from '../../utils/utils'
+import { isAxiosBadRequestError, isAxiosError } from '../../utils/utils'
 import Spinner from '../Spinner'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch } from '../../store'
@@ -51,11 +51,18 @@ export default function LoginForm(props: Props) {
         }, 1000)
       },
       onError: (error) => {
-        console.log('error', error)
         if (isAxiosBadRequestError<ErrorResponse<ValidationErrors>>(error)) {
           setError('email', {
             type: 'custom',
             message: error.response?.data.errors?.email?.msg
+          })
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (isAxiosError<ErrorResponse<any>>(error) && error.status === 401) {
+          setError('email', {
+            type: 'custom',
+            message: error.response?.data.message
           })
         }
       }

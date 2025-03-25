@@ -16,4 +16,4 @@ export interface ValidationErrorField {
   location: string
 }
 
-export type ValidationErrors = Record<string, ValidationErrorField>;
+export type ValidationErrors = Record<string, ValidationErrorField>
