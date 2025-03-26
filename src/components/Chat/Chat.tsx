@@ -4,52 +4,33 @@ import { useDispatch, useSelector } from 'react-redux'
 import socket from '../../utils/socket'
 import { RootState } from '../../store'
 import { setSelectedUser } from '../../store/selectedUserSlice'
+import { User } from '../../types/user.type'
+import { useQuery } from '@tanstack/react-query'
+import conversationApi from '../../apis/conversation.api'
+import { MessageType } from '../../types/conversation.type'
 
 const listUser = [
   {
-    _id: {
-      $oid: '67d92a0e57089235967c13fc'
-    },
+    _id: '67d92a0e57089235967c13fc',
     name: 'Chó Hào',
     email: 'ccc123@gmail.com',
-    date_of_birth: null,
-    password: 'b96d5a2dc9f027ada20a3ddbc3344337d15750fc84d37481b4a9f8f88b4a021d',
-    created_at: {
-      $date: '2025-03-18T08:08:46.651Z'
-    },
-    updated_at: {
-      $date: '2025-03-18T08:08:46.651Z'
-    },
-    email_verify_token:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjdkOTJhMGU1NzA4OTIzNTk2N2MxM2ZjIiwidG9rZW5fdHlwZSI6MywidmVyaWZ5IjowLCJpYXQiOjE3NDIyODUzMjYsImV4cCI6MTc0Mjg5MDEyNn0.u8pz_ibNKyL5Nqy-ig-KYTvlAPte6Hr7PHRmqIorBPE',
-    forgot_password_token: '',
-    verify: 0,
-    bio: null,
-    location: null,
-    website: null,
-    username: null,
+    date_of_birth: '2024-01-01T00:00:00.000Z',
+    created_at: '2025-03-18T08:08:46.651Z',
+    updated_at: '2025-03-18T08:08:46.651Z',
+    bio: '',
+    location: '',
+    website: '',
+    username: '',
     avatar: 'avatar-1742713662332-540753223.jpg',
-    cover_photo: null
+    cover_photo: ''
   },
   {
-    _id: {
-      $oid: '67dfd448f5c80cde482562b0'
-    },
+    _id: '67dfd448f5c80cde482562b0',
     name: 'Chó Bảo',
     email: 'duonghoaian.work@gmail.com',
-    date_of_birth: {
-      $date: '2024-01-01T00:00:00.000Z'
-    },
-    password: 'b96d5a2dc9f027ada20a3ddbc3344337d15750fc84d37481b4a9f8f88b4a021d',
-    created_at: {
-      $date: '2025-03-23T09:28:40.338Z'
-    },
-    updated_at: {
-      $date: '2025-03-23T09:28:50.635Z'
-    },
-    email_verify_token: '',
-    forgot_password_token: '',
-    verify: 1,
+    date_of_birth: '2024-01-01T00:00:00.000Z',
+    created_at: '2025-03-23T09:28:40.338Z',
+    updated_at: '2025-03-23T09:28:50.635Z',
     bio: '',
     location: '',
     website: '',
@@ -58,24 +39,12 @@ const listUser = [
     cover_photo: ''
   },
   {
-    _id: {
-      $oid: '67dfd4f3f5c80cde482562b4'
-    },
+    _id: '67dfd4f3f5c80cde482562b4',
     name: 'Dương Hoài Ân',
     email: 'dhan29112001@gmail.com',
-    date_of_birth: {
-      $date: '2024-01-01T00:00:00.000Z'
-    },
-    password: 'b96d5a2dc9f027ada20a3ddbc3344337d15750fc84d37481b4a9f8f88b4a021d',
-    created_at: {
-      $date: '2025-03-23T09:31:31.978Z'
-    },
-    updated_at: {
-      $date: '2025-03-23T09:35:08.575Z'
-    },
-    email_verify_token: '',
-    forgot_password_token: '',
-    verify: 1,
+    date_of_birth: '2024-01-01T00:00:00.000Z',
+    created_at: '2025-03-23T09:31:31.978Z',
+    updated_at: '2025-03-23T09:35:08.575Z',
     bio: '',
     location: '',
     website: '',
@@ -88,45 +57,73 @@ const listUser = [
 export default function Chat() {
   const [value, setValue] = useState('')
   const user = useSelector((state: RootState) => state.user.currentUser)
-  const [messages, setMessages] = useState<{ content: string; isSender: boolean }[]>([])
-  const selectedUserId = useSelector((state: RootState) => state.selectedUser.selectedUserId)
+  const [messages, setMessages] = useState<MessageType[]>([])
+  const selectedUser = useSelector((state: RootState) => state.selectedUser.userSelected)
+  const { data: conversations } = useQuery({
+    queryKey: ['conversations', user?._id, selectedUser?._id],
+    queryFn: () => {
+      return conversationApi.getConversation({
+        receiver_id: selectedUser?._id as string,
+        limit: 10,
+        page: 1
+      })
+    },
+    enabled: !!selectedUser
+  })
+  console.log(conversations)
   const dispatch = useDispatch()
   useEffect(() => {
+    if (!user) {
+      return
+    }
     socket.auth = {
       _id: user?._id
     }
     socket.connect()
-    socket.on('receive private message', (data) => {
-      const content = data.content
-      setMessages((prev) => [...prev, { content: content, isSender: false }])
+    socket.on('receive_message', (data) => {
+      const { payload } = data
+      setMessages((prev) => [...prev, payload])
       console.log(data)
     })
     return () => {
       socket.disconnect()
     }
-  }, [])
+  }, [user])
+
+  useEffect(() => {
+    if (conversations?.data) {
+      setMessages(conversations.data.data.conversations)
+    }
+  }, [conversations])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const send = (e: any) => {
     e.preventDefault()
     setValue('')
-    socket.emit('private message', {
+    const conversation = {
       content: value,
-      to: selectedUserId
+      sender_id: user?._id as string,
+      receiver_id: selectedUser?._id as string
+    }
+    socket.emit('send_message', {
+      payload: conversation
     })
 
     setMessages((prev) => [
       ...prev,
       {
-        content: value,
-        isSender: true
+        ...conversation,
+        _id: new Date().getTime().toString()
       }
     ])
   }
 
-  const selectUserToChat = (userId: string) => {
-    dispatch(setSelectedUser(userId))
+  const selectUserToChat = (newUser: User) => {
+    if (selectedUser?._id === newUser._id) return
+    dispatch(setSelectedUser(newUser))
+    setMessages(conversations?.data?.data?.conversations ?? [])
   }
+
   return (
     <>
       <div className='w-full lg:ml-[25%] flex flex-col'>
@@ -152,10 +149,10 @@ export default function Chat() {
             {listUser.map((user) => (
               <div
                 className={classNames('p-4 flex items-center space-x-2 cursor-pointer', {
-                  'bg-gray-800': user._id.$oid === selectedUserId
+                  'bg-gray-800': user._id === selectedUser?._id
                 })}
-                key={user._id.$oid}
-                onClick={() => selectUserToChat(user._id.$oid)}
+                key={user._id}
+                onClick={() => selectUserToChat(user)}
               >
                 <img
                   alt='OpenAI logo'
@@ -174,49 +171,64 @@ export default function Chat() {
           </div>
           {/* Chat Window */}
           <div className='w-full h-full lg:w-2/3 flex flex-col'>
-            <div className='flex items-center p-4 border-b border-gray-700'>
-              <img
-                alt='User profile picture'
-                className='rounded-full'
-                height={40}
-                src='https://placehold.co/40x40'
-                width={40}
-              />
-              <div className='ml-4 font-bold'>Bủng Khào</div>
-            </div>
-            <div className='h-full'>
-              {messages.map((message, index) => (
-                <div className='flex-grow p-4' key={index}>
-                  <div
-                    className={classNames('flex mb-4', {
-                      'justify-start': !message.isSender,
-                      'justify-end': message.isSender
-                    })}
-                  >
-                    <div className='bg-blue-500 text-white p-2 rounded-full'>{message.content}</div>
-                  </div>
-                  <div className='text-gray-500 text-sm text-right'>4:18 CH · Sent</div>
+            {selectedUser !== null ? (
+              <>
+                {' '}
+                <div className='flex items-center p-4 border-b border-gray-700'>
+                  <img
+                    alt='User profile picture'
+                    className='rounded-full'
+                    height={40}
+                    src='https://placehold.co/40x40'
+                    width={40}
+                  />
+                  <div className='ml-4 font-bold'>{selectedUser.name}</div>
                 </div>
-              ))}
-            </div>
-            <form onSubmit={send}>
-              <div className='p-4 border-t border-gray-700 flex items-center space-x-4'>
-                <i className='fas fa-image text-blue-500' />
-                <i className='fas fa-gift text-blue-500' />
-                <i className='fas fa-smile text-blue-500' />
-                <input
-                  className='flex-grow p-2 bg-gray-800 rounded-full text-white'
-                  placeholder='Type a message'
-                  type='text'
-                  onChange={(e) => setValue(e.target.value)}
-                  value={value}
-                />
-                <button className='bg-blue-500 text-white rounded-full px-4 py-2' type='submit'>
-                  Send
-                </button>
-                <i className='fas fa-paper-plane text-blue-500' />
+                <div className='h-full'>
+                  {Array.isArray(messages) &&
+                    messages.map((message, index) => (
+                      <div className='flex-grow p-4' key={index}>
+                        <div
+                          className={classNames('flex mb-4', {
+                            'justify-end': message.sender_id == user?._id,
+                            'justify-start': !(message.sender_id == user?._id)
+                          })}
+                        >
+                          <div className='bg-blue-500 text-white p-2 rounded-full'>{message.content}</div>
+                        </div>
+                        <div className='text-gray-500 text-sm text-right'>4:18 CH · Sent</div>
+                      </div>
+                    ))}
+                </div>
+                <form onSubmit={send}>
+                  <div className='p-4 border-t border-gray-700 flex items-center space-x-4'>
+                    <i className='fas fa-image text-blue-500' />
+                    <i className='fas fa-gift text-blue-500' />
+                    <i className='fas fa-smile text-blue-500' />
+                    <input
+                      className='flex-grow p-2 bg-gray-800 rounded-full text-white'
+                      placeholder='Type a message'
+                      type='text'
+                      onChange={(e) => setValue(e.target.value)}
+                      value={value}
+                    />
+                    <button className='bg-blue-500 text-white rounded-full px-4 py-2' type='submit'>
+                      Send
+                    </button>
+                    <i className='fas fa-paper-plane text-blue-500' />
+                  </div>
+                </form>
+              </>
+            ) : (
+              <div className='h-full flex justify-center items-center'>
+                <div>
+                  <h1 className='text-3xl font-bold text-center'>Select message</h1>
+                  <p className='text-center text-gray-500'>
+                    Choose from your existing conversations, start a new one, or just keep going.
+                  </p>
+                </div>
               </div>
-            </form>
+            )}
           </div>
         </div>
       </div>
