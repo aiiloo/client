@@ -38,7 +38,7 @@ export default function useRouteElement() {
           )
         },
         {
-          path: '/message',
+          path: '/messages',
           element: (
             <MainLayout>
               <Message />
@@ -52,7 +52,7 @@ export default function useRouteElement() {
       element: <ProtectedRoute />,
       children: [
         {
-          path: '/myProfile',
+          path: '/my-profile',
           element: (
             <MainLayout>
               <MyProfile />
