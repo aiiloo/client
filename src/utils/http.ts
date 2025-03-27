@@ -27,6 +27,9 @@ class Http {
       (config) => {
         if (this.accessToken) {
           config.headers.Authorization = `Bearer ${this.accessToken}`
+        } else {
+          const accessToken = getAccessTokenFromLS()
+          if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`
         }
         return config
       },
