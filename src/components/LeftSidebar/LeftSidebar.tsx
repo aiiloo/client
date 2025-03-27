@@ -7,6 +7,8 @@ import { LogoutType } from '../../types/user.type'
 import { clearLS, getRefreshTokenFromLS } from '../../utils/auth'
 import { logOut } from '../../store/user.slice'
 import { setLoading } from '../../store/spinner.slice'
+import { NavLink } from 'react-router-dom'
+import classNames from 'classnames'
 
 export default function LeftSidebar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -43,9 +45,20 @@ export default function LeftSidebar() {
           <i className='fab fa-twitter text-2xl'></i>
         </div>
         <nav className='space-y-4'>
-          <a className='flex items-center space-x-8 text-xl' href='#'>
+          <NavLink
+            to='/'
+            className={({ isActive }) => {
+              return classNames(
+                'flex items-center space-x-8 text-xl dark:text-white hover:text-white hover:brightness-125 hover:scale-105 transition-transform duration-200',
+                {
+                  'text-white': isActive,
+                  'text-gray-800': !isActive
+                }
+              )
+            }}
+          >
             <svg
-              className='w-[25px] h-[25px] text-gray-800 dark:text-white'
+              className='w-[25px] h-[25px] dark:text-white'
               aria-hidden='true'
               xmlns='http://www.w3.org/2000/svg'
               width='24'
@@ -61,10 +74,21 @@ export default function LeftSidebar() {
             </svg>
 
             <span>Home</span>
-          </a>
-          <a className='flex items-center space-x-8 text-xl' href='#'>
+          </NavLink>
+          <NavLink
+            to='/discover'
+            className={({ isActive }) => {
+              return classNames(
+                'flex items-center space-x-8 text-xl dark:text-white hover:text-white hover:brightness-125 hover:scale-105 transition-transform duration-200',
+                {
+                  'text-white': isActive,
+                  'text-gray-800': !isActive
+                }
+              )
+            }}
+          >
             <svg
-              className='w-[25px] h-[25px] text-gray-800 dark:text-white'
+              className='w-[25px] h-[25px] dark:text-white'
               aria-hidden='true'
               xmlns='http://www.w3.org/2000/svg'
               width='24'
@@ -81,10 +105,21 @@ export default function LeftSidebar() {
             </svg>
 
             <span>Discover</span>
-          </a>
-          <a className='flex items-center space-x-8 text-xl' href='#'>
+          </NavLink>
+          <NavLink
+            to='/notifications'
+            className={({ isActive }) => {
+              return classNames(
+                'flex items-center space-x-8 text-xl dark:text-white hover:text-white hover:brightness-125 hover:scale-105 transition-transform duration-200',
+                {
+                  'text-white': isActive,
+                  'text-gray-800': !isActive
+                }
+              )
+            }}
+          >
             <svg
-              className='w-[25px] h-[25px] text-gray-800 dark:text-white'
+              className='w-[25px] h-[25px] dark:text-white'
               aria-hidden='true'
               xmlns='http://www.w3.org/2000/svg'
               width='24'
@@ -102,10 +137,21 @@ export default function LeftSidebar() {
             </svg>
 
             <span>Notification</span>
-          </a>
-          <a className='flex items-center space-x-8 text-xl' href='#'>
+          </NavLink>
+          <NavLink
+            to='/messages'
+            className={({ isActive }) => {
+              return classNames(
+                'flex items-center space-x-8 text-xl dark:text-white hover:text-white hover:brightness-125 hover:scale-105 transition-transform duration-200',
+                {
+                  'text-white': isActive,
+                  'text-gray-800': !isActive
+                }
+              )
+            }}
+          >
             <svg
-              className='w-[25px] h-[25px] text-gray-800 dark:text-white'
+              className='w-[25px] h-[25px] dark:text-white'
               aria-hidden='true'
               xmlns='http://www.w3.org/2000/svg'
               width='24'
@@ -118,10 +164,21 @@ export default function LeftSidebar() {
             </svg>
 
             <span>Message</span>
-          </a>
-          <a className='flex items-center space-x-8 text-xl' href='#'>
+          </NavLink>
+          <NavLink
+            to='/ai'
+            className={({ isActive }) => {
+              return classNames(
+                'flex items-center space-x-8 text-xl dark:text-white hover:text-white hover:brightness-125 hover:scale-105 transition-transform duration-200',
+                {
+                  'text-white': isActive,
+                  'text-gray-800': !isActive
+                }
+              )
+            }}
+          >
             <svg
-              className='w-[25px] h-[25px] text-gray-800 dark:text-white'
+              className='w-[25px] h-[25px] dark:text-white'
               aria-hidden='true'
               xmlns='http://www.w3.org/2000/svg'
               width='24'
@@ -133,10 +190,21 @@ export default function LeftSidebar() {
             </svg>
 
             <span>Ai</span>
-          </a>
-          <a className='flex items-center space-x-8 text-xl' href='#'>
+          </NavLink>
+          <NavLink
+            to='/lists'
+            className={({ isActive }) => {
+              return classNames(
+                'flex items-center space-x-8 text-xl dark:text-white hover:text-white hover:brightness-125 hover:scale-105 transition-transform duration-200',
+                {
+                  'text-white': isActive,
+                  'text-gray-800': !isActive
+                }
+              )
+            }}
+          >
             <svg
-              className='w-[25px] h-[25px] text-gray-800 dark:text-white'
+              className='w-[25px] h-[25px] dark:text-white'
               aria-hidden='true'
               xmlns='http://www.w3.org/2000/svg'
               width='24'
@@ -154,10 +222,21 @@ export default function LeftSidebar() {
             </svg>
 
             <span>Lists</span>
-          </a>
-          <a className='flex items-center space-x-8 text-xl' href='#'>
+          </NavLink>
+          <NavLink
+            to='/bookmarks'
+            className={({ isActive }) => {
+              return classNames(
+                'flex items-center space-x-8 text-xl dark:text-white hover:text-white hover:brightness-125 hover:scale-105 transition-transform duration-200',
+                {
+                  'text-white': isActive,
+                  'text-gray-800': !isActive
+                }
+              )
+            }}
+          >
             <svg
-              className='w-[25px] h-[25px] text-gray-800 dark:text-white'
+              className='w-[25px] h-[25px] dark:text-white'
               aria-hidden='true'
               xmlns='http://www.w3.org/2000/svg'
               width='24'
@@ -175,11 +254,22 @@ export default function LeftSidebar() {
             </svg>
 
             <span>Bookmarks</span>
-          </a>
+          </NavLink>
 
-          <a className='flex items-center space-x-8 text-xl' href='#'>
+          <NavLink
+            to='/community'
+            className={({ isActive }) => {
+              return classNames(
+                'flex items-center space-x-8 text-xl dark:text-white hover:text-white hover:brightness-125 hover:scale-105 transition-transform duration-200',
+                {
+                  'text-white': isActive,
+                  'text-gray-800': !isActive
+                }
+              )
+            }}
+          >
             <svg
-              className='w-[25px] h-[25px] text-gray-800 dark:text-white'
+              className='w-[25px] h-[25px] dark:text-white'
               aria-hidden='true'
               xmlns='http://www.w3.org/2000/svg'
               width='24'
@@ -196,13 +286,20 @@ export default function LeftSidebar() {
             </svg>
 
             <span>Community</span>
-          </a>
-          {/* <a className='flex items-center space-x-8 text-xl' href='#'>
-      <i className='fas fa-star'></i>
-      <span>Premium</span>
-    </a> */}
+          </NavLink>
 
-          <a className='flex items-center space-x-8 text-xl' href='/myProfile'>
+          <NavLink
+            to='/my-profile'
+            className={({ isActive }) => {
+              return classNames(
+                'flex items-center space-x-8 text-xl dark:text-white hover:text-white hover:brightness-125 hover:scale-105 transition-transform duration-200',
+                {
+                  'text-white': isActive,
+                  'text-gray-800': !isActive
+                }
+              )
+            }}
+          >
             <svg
               className='w-6 h-6 text-gray-800 dark:text-white'
               aria-hidden='true'
@@ -220,11 +317,22 @@ export default function LeftSidebar() {
             </svg>
 
             <span>My Profile</span>
-          </a>
+          </NavLink>
 
-          <a className='flex items-center space-x-8 text-xl' href='#'>
+          <NavLink
+            to='/more'
+            className={({ isActive }) => {
+              return classNames(
+                'flex items-center space-x-8 text-xl dark:text-white hover:text-white hover:brightness-125 hover:scale-105 transition-transform duration-200',
+                {
+                  'text-white': isActive,
+                  'text-gray-800': !isActive
+                }
+              )
+            }}
+          >
             <svg
-              className='w-[25px] h-[25px] text-gray-800 dark:text-white'
+              className='w-[25px] h-[25px] dark:text-white'
               aria-hidden='true'
               xmlns='http://www.w3.org/2000/svg'
               width='24'
@@ -236,7 +344,7 @@ export default function LeftSidebar() {
             </svg>
 
             <span>More</span>
-          </a>
+          </NavLink>
         </nav>
         <button className='bg-white flex justify-center items-center text-black rounded-full px-6 py-2 mt-4 w-1/2'>
           <span>Post</span>
