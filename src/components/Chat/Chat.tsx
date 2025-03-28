@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import classNames from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
+import InfiniteScroll from 'react-infinite-scroll-component'
 import socket from '../../utils/socket'
 import { RootState } from '../../store'
 import { setSelectedUser } from '../../store/selectedUserSlice'
 import { User } from '../../types/user.type'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import conversationApi from '../../apis/conversation.api'
 import { MessageType } from '../../types/conversation.type'
 
@@ -54,23 +55,27 @@ const listUser = [
   }
 ]
 
+const LIMIT = 5
+const PAGE = 1
+
 export default function Chat() {
   const [value, setValue] = useState('')
   const user = useSelector((state: RootState) => state.user.currentUser)
   const [messages, setMessages] = useState<MessageType[]>([])
+  const [page, setPage] = useState(PAGE)
   const selectedUser = useSelector((state: RootState) => state.selectedUser.userSelected)
-  const { data: conversations } = useQuery({
-    queryKey: ['conversations', user?._id, selectedUser?._id],
+  const { data: conversations, isFetching } = useQuery({
+    queryKey: ['conversations', user?._id, selectedUser?._id, page],
     queryFn: () => {
       return conversationApi.getConversation({
         receiver_id: selectedUser?._id as string,
-        limit: 10,
-        page: 1
+        limit: LIMIT,
+        page
       })
     },
-    enabled: !!selectedUser
+    enabled: !!selectedUser,
+    placeholderData: keepPreviousData
   })
-  console.log(conversations)
   const dispatch = useDispatch()
   useEffect(() => {
     if (!user) {
@@ -92,7 +97,8 @@ export default function Chat() {
 
   useEffect(() => {
     if (conversations?.data) {
-      setMessages(conversations.data.data.conversations)
+      setMessages((prev) => [...prev, ...conversations.data.data.conversations])
+      console.log(conversations)
     }
   }, [conversations])
 
@@ -122,6 +128,12 @@ export default function Chat() {
     if (selectedUser?._id === newUser._id) return
     dispatch(setSelectedUser(newUser))
     setMessages(conversations?.data?.data?.conversations ?? [])
+  }
+
+  const loadMore = () => {
+    if (page < conversations?.data?.data?.total_pages) {
+      setPage((prev) => prev + 1)
+    }
   }
 
   return (
@@ -185,20 +197,46 @@ export default function Chat() {
                   <div className='ml-4 font-bold'>{selectedUser.name}</div>
                 </div>
                 <div className='h-full'>
-                  {Array.isArray(messages) &&
-                    messages.map((message, index) => (
-                      <div className='flex-grow p-4' key={index}>
-                        <div
-                          className={classNames('flex mb-4', {
-                            'justify-end': message.sender_id == user?._id,
-                            'justify-start': !(message.sender_id == user?._id)
-                          })}
-                        >
-                          <div className='bg-blue-500 text-white p-2 rounded-full'>{message.content}</div>
+                  <div>{isFetching && <h4 className='text-center text-gray-500'>Đang tải...</h4>}</div>
+                  <div
+                    id='scrollableDiv'
+                    style={{
+                      height: 500,
+                      overflow: 'auto',
+                      display: 'flex',
+                      flexDirection: 'column-reverse'
+                    }}
+                  >
+                    {/*Put the scroll bar always on the bottom*/}
+                    <InfiniteScroll
+                      dataLength={messages.length}
+                      next={loadMore}
+                      style={{ display: 'flex', flexDirection: 'column-reverse' }} //To put endMessage and loader to the top.
+                      inverse={true} //
+                      hasMore={page < conversations?.data?.data?.total_pages}
+                      loader={
+                        <div className='w-full text-center'>
+                          <h4 className='text-center text-gray-500'>Đang tải...</h4>
                         </div>
-                        <div className='text-gray-500 text-sm text-right'>4:18 CH · Sent</div>
-                      </div>
-                    ))}
+                      }
+                      scrollableTarget='scrollableDiv'
+                    >
+                      {Array.isArray(messages) &&
+                        messages.map((message, index) => (
+                          <div className='flex-grow p-4' key={index}>
+                            <div
+                              className={classNames('flex mb-4', {
+                                'justify-end': message.sender_id == user?._id,
+                                'justify-start': !(message.sender_id == user?._id)
+                              })}
+                            >
+                              <div className='bg-blue-500 text-white p-2 rounded-full'>{message.content}</div>
+                            </div>
+                            <div className='text-gray-500 text-sm text-right'>4:18 CH · Sent</div>
+                          </div>
+                        ))}
+                    </InfiniteScroll>
+                  </div>
                 </div>
                 <form onSubmit={send}>
                   <div className='p-4 border-t border-gray-700 flex items-center space-x-4'>
