@@ -40,7 +40,7 @@ const listUser = [
     cover_photo: ''
   },
   {
-    _id: '67dfd4f3f5c80cde482562b4',
+    _id: '67e6bb721625c3e2bb97704c',
     name: 'Dương Hoài Ân',
     email: 'dhan29112001@gmail.com',
     date_of_birth: '2024-01-01T00:00:00.000Z',
@@ -78,17 +78,13 @@ export default function Chat() {
   })
   const dispatch = useDispatch()
   useEffect(() => {
-    if (!user) {
-      return
-    }
     socket.auth = {
       _id: user?._id
     }
     socket.connect()
     socket.on('receive_message', (data) => {
       const { payload } = data
-      setMessages((prev) => [...prev, payload])
-      console.log(data)
+      setMessages((prev) => [payload, ...prev])
     })
     return () => {
       socket.disconnect()
@@ -116,12 +112,13 @@ export default function Chat() {
     })
 
     setMessages((prev) => [
-      ...prev,
       {
         ...conversation,
         _id: new Date().getTime().toString()
-      }
+      },
+      ...prev
     ])
+    // refetch()
   }
 
   const selectUserToChat = (newUser: User) => {
