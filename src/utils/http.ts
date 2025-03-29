@@ -25,12 +25,8 @@ class Http {
 
     this.instance.interceptors.request.use(
       (config) => {
-        if (this.accessToken) {
-          config.headers.Authorization = `Bearer ${this.accessToken}`
-        } else {
-          const accessToken = getAccessTokenFromLS()
-          if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`
-        }
+        const accessToken = getAccessTokenFromLS() as string
+        config.headers.Authorization = `Bearer ${accessToken}`
         return config
       },
       (error) => {
