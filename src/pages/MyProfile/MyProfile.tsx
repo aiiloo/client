@@ -1,6 +1,24 @@
 import RightSidebar from '../../components/RightSidebar'
+import { useQuery } from '@tanstack/react-query'
+import userApi from '../../apis/user.api'
+import EditProfile from '../../components/EditProfile'
+import { useState } from 'react'
+import { useSelector } from 'react-redux'
+import { RootState } from '../../store'
 
 export default function MyProfile() {
+  // const [data, setData] = useState<User>()
+  const [isOpen, setIsOpen] = useState(false)
+  const user = useSelector((state: RootState) => state.user.currentUser)
+
+  const { data } = useQuery({
+    queryKey: ['userInfo', user?._id],
+    queryFn: () => {
+      return userApi.myProfile()
+    }
+  })
+  console.log('check data123', data)
+
   return (
     <>
       <div className='bg-black text-white '>
@@ -17,19 +35,29 @@ export default function MyProfile() {
               <div className='absolute top-auto left-4'>
                 <img
                   alt='Profile picture with a purple background and a white letter B'
-                  className='rounded-full border-4 border-black'
-                  height='100'
-                  src='https://storage.googleapis.com/a1aa/image/jVI-8aJKZsDRxFeYuCzWDCY58zjIvN0eE6aZLT2r7CI.jpg'
-                  width='100'
+                  className='rounded-full border-4 border-black w-[100px] h-[100px]'
+                  src={
+                    data?.data.data.avatar
+                      ? `http://localhost:4000/assets/images/${data?.data.data.avatar}`
+                      : 'https://storage.googleapis.com/a1aa/image/jVI-8aJKZsDRxFeYuCzWDCY58zjIvN0eE6aZLT2r7CI.jpg'
+                  }
                 />
               </div>
               <div className='absolute top-3 right-4'>
-                <button className='border border-gray-600 px-4 py-1 rounded-full'>Edit profile</button>
+                <button
+                  data-modal-target='default-modal'
+                  data-modal-toggle='default-modal'
+                  className='border border-gray-600 px-4 py-1 rounded-full hover:bg-[#354352]'
+                  type='button'
+                  onClick={() => setIsOpen(!isOpen)}
+                >
+                  Edit profile
+                </button>
               </div>
             </div>
             <div className='mt-16'>
-              <div className='text-xl font-bold'>Bao Pham</div>
-              <div className='text-gray-500'>@GiaBao66</div>
+              <div className='text-xl font-bold'>{data?.data.data.name}</div>
+              <div className='text-gray-500'>{data?.data.data.username}</div>
               <div className='text-gray-500 mt-2'>
                 <i className='far fa-calendar-alt'></i> Joined March 2025
               </div>
@@ -133,6 +161,7 @@ export default function MyProfile() {
         </div>
       </div>
       <RightSidebar />
+      <EditProfile isOpen={isOpen} setIsOpen={setIsOpen} userInfo={data?.data.data} />
     </>
   )
 }
