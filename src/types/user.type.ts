@@ -25,3 +25,13 @@ export interface LogoutType {
 export interface RefreshTokenType {
   refresh_token: string
 }
+
+export interface ProfileUser {
+  name?: string | null
+  date_of_birth?: string | null
+  bio?: string | null
+  location?: string | null
+  website?: string | null
+  avatar?: File | string | null
+  cover_photo?: File | string | null
+}
