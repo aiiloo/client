@@ -7,7 +7,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { ProfileUser } from '../../types/user.type'
 import { updateCurrentUser } from '../../store/user.slice'
 import Spinner from '../Spinner'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 interface Props {
   isOpen: boolean
@@ -26,13 +26,7 @@ export default function EditProfile(props: Props) {
 
   const [isShowSpinner, setIsShowSpinner] = useState(false)
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    setError,
-    formState: { errors }
-  } = useForm({
+  const { register, control, handleSubmit } = useForm({
     defaultValues: {
       ...user
     }
@@ -48,7 +42,7 @@ export default function EditProfile(props: Props) {
   }
 
   const updateProfileMutation = useMutation({
-    mutationFn: (body: ProfileUser) => userApi.updateProfile(body)
+    mutationFn: (body: ProfileUser | FormData) => userApi.updateProfile(body)
   })
 
   const onSubmit = handleSubmit((data) => {

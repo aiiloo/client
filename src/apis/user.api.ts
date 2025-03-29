@@ -24,7 +24,7 @@ const userApi = {
   myProfile() {
     return http.get('/users/myProfile')
   },
-  updateProfile(body: ProfileUser) {
+  updateProfile(body: ProfileUser | FormDataa) {
     return http.post('/users/profile/update', body, {
       headers: {
         'Content-Type': 'multipart/form-data'
