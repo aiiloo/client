@@ -27,11 +27,11 @@ export interface RefreshTokenType {
 }
 
 export interface ProfileUser {
-  name?: string | null
-  date_of_birth?: string | null
-  bio?: string | null
-  location?: string | null
-  website?: string | null
-  avatar?: File | string | null
-  cover_photo?: File | string | null
+  name?: string | ''
+  date_of_birth?: string | ''
+  bio?: string | ''
+  location?: string | ''
+  website?: string | ''
+  avatar?: File | string | ''
+  cover_photo?: File | string | ''
 }
