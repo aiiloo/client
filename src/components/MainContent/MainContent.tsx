@@ -4,6 +4,7 @@ import postApi from '../../apis/post.api'
 import { useMutation } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
+import { Post } from '../../types/post.type'
 
 export default function MainContent() {
   const [isOpen, setIsOpen] = useState(false)
@@ -367,9 +368,9 @@ export default function MainContent() {
             <p className='text-blue-500'>Show 35 posts</p>
           </div>
           {data &&
-            data.data.data.map((item, index) => {
+            data.data.data.map((item: Post, index: number) => {
               return (
-                <div className='p-4 border-b border-gray-700'>
+                <div key={`post-${index}`} className='p-4 border-b border-gray-700'>
                   <div className=' flex items-center space-x-2'>
                     <img
                       alt='User profile picture'
@@ -382,7 +383,7 @@ export default function MainContent() {
                     </div>
                   </div>
                   <p className='mt-2'>{item.content}</p>
-                  {item.medias.map((media, index) => {
+                  {item.medias.map((media, index: number) => {
                     if (media.type === 0)
                       return (
                         <img
