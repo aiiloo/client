@@ -163,7 +163,6 @@ export default function EditProfile(props: Props) {
                         ref={coverPhotoRef}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           field.onChange(e.target?.files)
-                          console.log('e.target', e.target)
                         }}
                       />
                     )}
