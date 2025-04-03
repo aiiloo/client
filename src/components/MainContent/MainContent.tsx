@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import postApi from '../../apis/post.api'
 import { useMutation } from '@tanstack/react-query'
+import { motion } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 
 export default function MainContent() {
   const [isOpen, setIsOpen] = useState(false)
@@ -10,6 +12,7 @@ export default function MainContent() {
   const medias = useRef<HTMLInputElement | null>(null)
   const [isPostDisabled, setIsPostDisabled] = useState(false)
   const [filesError, setFilesError] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
 
   const { register, control, handleSubmit, watch } = useForm({})
 
@@ -80,11 +83,23 @@ export default function MainContent() {
     }
 
     newPost.mutate(formData, {
-      onSuccess: async () => {},
+      onSuccess: async () => {
+        setTimeout(() => {
+          setShowSuccess(true)
+        }, 2000)
+        setShowSuccess(false)
+      },
       onError: (error) => {
         console.log('error', error)
       }
     })
+  })
+
+  const { data } = useQuery({
+    queryKey: ['posts'],
+    queryFn: () => {
+      return postApi.getAllPost()
+    }
   })
 
   return (
@@ -325,6 +340,17 @@ export default function MainContent() {
                     Array.from(mediasFiles as FileList).map((item, index) => {
                       console.log('item', item)
                       const previewUrl = URL.createObjectURL(item)
+                      if (item.type === 'video/mp4')
+                        return (
+                          <video
+                            className='w-full h-full max-w-[516px] max-h-[516px] object-contain mt-1'
+                            src={previewUrl}
+                            key={`review-${index}`}
+                            controls
+                            autoPlay
+                            loop
+                          />
+                        )
                       return (
                         <img
                           className='w-60 h-60 m-3 object-cover rounded-lg'
@@ -340,145 +366,139 @@ export default function MainContent() {
           <div className='p-4 border-b border-gray-700'>
             <p className='text-blue-500'>Show 35 posts</p>
           </div>
-          <div className='p-4 border-b border-gray-700'>
-            <div className='flex items-center space-x-2'>
-              <img alt='User profile picture' className='rounded-full' src='https://placehold.co/40x40' />
-              <div>
-                <span className='font-bold'>Elon Musk</span>
-                <span className='text-gray-500'>@elonmusk · March 20</span>
-              </div>
-            </div>
-            <p className='mt-2'>
-              Reservoir
-              <span className='text-blue-500'>DOGE</span>
-            </p>
-            {/* <img
-              alt='Elon Musk with DOGE sign'
-              className='mt-2 ml-4 md:w-[516px] md:h-[516px] w-auto h-auto'
-              src='http://localhost:4000/assets/images/medias-1743407709240-761762300.mp4'
-            /> */}
-            <video
-              className='w-full h-full max-w-[516px] max-h-[516px] object-contain mt-1'
-              src='http://localhost:4000/assets/images/medias-1743407709240-761762300.mp4'
-              controls
-              autoPlay
-              loop
-            />
-            <div className='flex justify-between mt-2 text-gray-500'>
-              <div className='flex flex-warp cursor-pointer hover:text-rose-600 group'>
-                <svg
-                  className='w-6 h-6 text-gray-500 group-hover:text-rose-600'
-                  aria-hidden='true'
-                  xmlns='http://www.w3.org/2000/svg'
-                  width={24}
-                  height={24}
-                  fill='none'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M12.01 6.001C6.5 1 1 8 5.782 13.001L12.011 20l6.23-7C23 8 17.5 1 12.01 6.002Z'
-                  />
-                </svg>
+          {data &&
+            data.data.data.map((item, index) => {
+              return (
+                <div className='p-4 border-b border-gray-700'>
+                  <div className=' flex items-center space-x-2'>
+                    <img
+                      alt='User profile picture'
+                      className='rounded-full w-10 h-10'
+                      src={`http://localhost:4000/assets/images/${item.user.avatar}`}
+                    />
+                    <div>
+                      <span className='font-bold'>{item.user.name}</span>
+                      <span className='text-gray-500'>{item.user.username}</span>
+                    </div>
+                  </div>
+                  <p className='mt-2'>{item.content}</p>
+                  {item.medias.map((media, index) => {
+                    if (media.type === 0)
+                      return (
+                        <img
+                          key={`media-${index}`}
+                          alt='Elon Musk with DOGE sign'
+                          className='mt-2 ml-4 md:w-[516px] md:h-[516px] w-auto h-auto'
+                          src={`http://localhost:4000/assets/images/${media.url}`}
+                        />
+                      )
+                    return (
+                      <video
+                        className='w-full h-full max-w-[516px] max-h-[516px] object-contain mt-1'
+                        src={`http://localhost:4000/assets/images/${media.url}`}
+                        controls
+                        autoPlay
+                        loop
+                      />
+                    )
+                  })}
 
-                <p className='mt-1 ml-1'>14k</p>
-              </div>
-              <div className='flex flex-warp cursor-pointer'>
-                <svg
-                  className='w-6 h-6 text-gray-500 hover:text-green-500'
-                  aria-hidden='true'
-                  xmlns='http://www.w3.org/2000/svg'
-                  width={24}
-                  height={24}
-                  fill='none'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='m16 10 3-3m0 0-3-3m3 3H5v3m3 4-3 3m0 0 3 3m-3-3h14v-3'
-                  />
-                </svg>
-              </div>
-              <div className='flex flex-warp cursor-pointer hover:text-blue-400 group'>
-                <svg
-                  className='w-6 h-6 text-gray-500 group-hover:text-blue-400'
-                  aria-hidden='true'
-                  xmlns='http://www.w3.org/2000/svg'
-                  width={24}
-                  height={24}
-                  fill='none'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    stroke='currentColor'
-                    strokeWidth={2}
-                    d='M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z'
-                  />
-                  <path stroke='currentColor' strokeWidth={2} d='M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z' />
-                </svg>
-                <p className='mt-1 ml-1'>24k</p>
-              </div>
-              <div className='flex flex-warp cursor-pointer hover:text-blue-400 group'>
-                <svg
-                  className='w-6 h-6 text-gray-500 group-hover:text-blue-400'
-                  aria-hidden='true'
-                  xmlns='http://www.w3.org/2000/svg'
-                  width={24}
-                  height={24}
-                  fill='none'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='m15.141 6 5.518 4.95a1.05 1.05 0 0 1 0 1.549l-5.612 5.088m-6.154-3.214v1.615a.95.95 0 0 0 1.525.845l5.108-4.251a1.1 1.1 0 0 0 0-1.646l-5.108-4.251a.95.95 0 0 0-1.525.846v1.7c-3.312 0-6 2.979-6 6.654v1.329a.7.7 0 0 0 1.344.353 5.174 5.174 0 0 1 4.652-3.191l.004-.003Z'
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-          <div className='p-4 border-b border-gray-700'>
-            <div className='flex items-center space-x-2'>
-              <img alt='User profile picture' className='rounded-full' src='https://placehold.co/40x40' />
-              <div>
-                <span className='font-bold'>Zacharias Creutznacher</span>
-                <span className='text-gray-500'>@Sairahcaz2k · March 20</span>
-              </div>
-            </div>
-            <p className='mt-2'>
-              Simple multi tenancy for
-              <span className='text-blue-500'>laravelphp</span>
-            </p>
-            <img alt='Code snippet' className='mt-2' src='https://placehold.co/500x300' />
-            <div className='flex justify-between mt-2 text-gray-500'>
-              <span>
-                <i className='far fa-comment'></i>
-                14K
-              </span>
-              <span>
-                <i className='fas fa-retweet'></i>
-                23K
-              </span>
-              <span>
-                <i className='far fa-heart'></i>
-                216K
-              </span>
-              <span>
-                <i className='fas fa-share'></i>
-                29K
-              </span>
-            </div>
-          </div>
+                  <div className='flex justify-between mt-2 text-gray-500'>
+                    <div className='flex flex-warp cursor-pointer hover:text-rose-600 group'>
+                      <svg
+                        className='w-6 h-6 text-gray-500 group-hover:text-rose-600'
+                        aria-hidden='true'
+                        xmlns='http://www.w3.org/2000/svg'
+                        width={24}
+                        height={24}
+                        fill='none'
+                        viewBox='0 0 24 24'
+                      >
+                        <path
+                          stroke='currentColor'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='M12.01 6.001C6.5 1 1 8 5.782 13.001L12.011 20l6.23-7C23 8 17.5 1 12.01 6.002Z'
+                        />
+                      </svg>
+
+                      <p className='mt-1 ml-1'>14k</p>
+                    </div>
+                    <div className='flex flex-warp cursor-pointer'>
+                      <svg
+                        className='w-6 h-6 text-gray-500 hover:text-green-500'
+                        aria-hidden='true'
+                        xmlns='http://www.w3.org/2000/svg'
+                        width={24}
+                        height={24}
+                        fill='none'
+                        viewBox='0 0 24 24'
+                      >
+                        <path
+                          stroke='currentColor'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='m16 10 3-3m0 0-3-3m3 3H5v3m3 4-3 3m0 0 3 3m-3-3h14v-3'
+                        />
+                      </svg>
+                    </div>
+                    <div className='flex flex-warp cursor-pointer hover:text-blue-400 group'>
+                      <svg
+                        className='w-6 h-6 text-gray-500 group-hover:text-blue-400'
+                        aria-hidden='true'
+                        xmlns='http://www.w3.org/2000/svg'
+                        width={24}
+                        height={24}
+                        fill='none'
+                        viewBox='0 0 24 24'
+                      >
+                        <path
+                          stroke='currentColor'
+                          strokeWidth={2}
+                          d='M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z'
+                        />
+                        <path stroke='currentColor' strokeWidth={2} d='M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z' />
+                      </svg>
+                      <p className='mt-1 ml-1'>24k</p>
+                    </div>
+                    <div className='flex flex-warp cursor-pointer hover:text-blue-400 group'>
+                      <svg
+                        className='w-6 h-6 text-gray-500 group-hover:text-blue-400'
+                        aria-hidden='true'
+                        xmlns='http://www.w3.org/2000/svg'
+                        width={24}
+                        height={24}
+                        fill='none'
+                        viewBox='0 0 24 24'
+                      >
+                        <path
+                          stroke='currentColor'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='m15.141 6 5.518 4.95a1.05 1.05 0 0 1 0 1.549l-5.612 5.088m-6.154-3.214v1.615a.95.95 0 0 0 1.525.845l5.108-4.251a1.1 1.1 0 0 0 0-1.646l-5.108-4.251a.95.95 0 0 0-1.525.846v1.7c-3.312 0-6 2.979-6 6.654v1.329a.7.7 0 0 0 1.344.353 5.174 5.174 0 0 1 4.652-3.191l.004-.003Z'
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
         </div>
       </div>
+      {showSuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.5 }}
+          className='fixed top-10 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg'
+        >
+          🎉 create post successfully
+        </motion.div>
+      )}
     </>
   )
 }

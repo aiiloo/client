@@ -17,7 +17,6 @@ export default function MyProfile() {
       return userApi.myProfile()
     }
   })
-  console.log('check data123', data)
 
   return (
     <>
@@ -25,7 +24,7 @@ export default function MyProfile() {
         <div className='max-w-screen-sm mx-auto m-sm-50'>
           <div className='bg-gray-900 p-4'>
             <div className='flex items-center justify-between'>
-              <div className='text-xl font-bold'>Bao Pham</div>
+              <div className='text-xl font-bold'>{data?.data.data.name}</div>
               <div className='text-sm'>0 posts</div>
             </div>
           </div>
