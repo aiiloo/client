@@ -35,3 +35,9 @@ export interface ProfileUser {
   avatar?: File | string | ''
   cover_photo?: File | string | ''
 }
+
+export interface SearchUser {
+  search_key: string
+  limit: number
+  page: number
+}
