@@ -9,6 +9,7 @@ import pdfIcon from '../../../../assets/icons/pdf-file.png'
 import docIcon from '../../../../assets/icons/doc.png'
 import excelIcon from '../../../../assets/icons/excel-file.png'
 import file from '../../../../assets/icons/file.png'
+import { formatDate } from '../../../../utils/date'
 
 interface Props {
   messages: MessageType[]
@@ -16,6 +17,9 @@ interface Props {
   loadMore: () => void
   hasMore: boolean
   isFetching: boolean
+  onDeleteMessage?: (messageId: string) => void
+  onShareMessage?: (message: MessageType) => void
+  onReplyMessage?: (message: MessageType) => void
 }
 
 const fileIcons = {
@@ -30,8 +34,42 @@ const fileIcons = {
 
 const defaultFileIcon = file
 
-export default function ChatWindow({ messages, user, loadMore, hasMore, isFetching }: Props) {
+export default function ChatWindow({
+  messages,
+  user,
+  loadMore,
+  hasMore,
+  isFetching,
+  onDeleteMessage,
+  onShareMessage,
+  onReplyMessage
+}: Props) {
   const [selectedImage, setSelectedImage] = useState('')
+  const [activeMessageOptions, setActiveMessageOptions] = useState<string | null>(null)
+
+  const handleOptionsClick = (messageId: string) => {
+    if (activeMessageOptions === messageId) {
+      setActiveMessageOptions(null)
+    } else {
+      setActiveMessageOptions(messageId)
+    }
+  }
+
+  const handleDeleteMessage = (messageId: string) => {
+    if (onDeleteMessage) onDeleteMessage(messageId)
+    setActiveMessageOptions(null)
+  }
+
+  const handleShareMessage = (message: MessageType) => {
+    if (onShareMessage) onShareMessage(message)
+    setActiveMessageOptions(null)
+  }
+
+  const handleReplyMessage = (message: MessageType) => {
+    if (onReplyMessage) onReplyMessage(message)
+    setActiveMessageOptions(null)
+  }
+
   return (
     <div className='h-full'>
       <div>{isFetching && <h4 className='text-center text-gray-500'>Đang tải...</h4>}</div>
@@ -46,12 +84,11 @@ export default function ChatWindow({ messages, user, loadMore, hasMore, isFetchi
           overflowAnchor: 'none'
         }}
       >
-        {/*Put the scroll bar always on the bottom*/}
         <InfiniteScroll
           dataLength={messages.length}
           next={loadMore}
-          style={{ display: 'flex', flexDirection: 'column-reverse' }} //To put endMessage and loader to the top.
-          inverse={true} //
+          style={{ display: 'flex', flexDirection: 'column-reverse' }}
+          inverse={true}
           hasMore={hasMore}
           loader={<></>}
           scrollableTarget='scrollableDiv'
@@ -78,7 +115,6 @@ export default function ChatWindow({ messages, user, loadMore, hasMore, isFetchi
                       {media.type === 'video' && (
                         <video controls className='max-w-[250px] max-h-[200px] rounded-lg'>
                           <source src={media.url} type='video/mp4' />
-                          Trình duyệt của bạn không hỗ trợ video.
                         </video>
                       )}
                       {media.type === 'audio' && <audio controls src={media.url}></audio>}
@@ -86,9 +122,7 @@ export default function ChatWindow({ messages, user, loadMore, hasMore, isFetchi
                       {media.type === 'document' &&
                         (() => {
                           const fileExtension = media.name?.split('.').pop()?.toLowerCase() as keyof typeof fileIcons
-
                           const icon = fileIcons[fileExtension] || defaultFileIcon
-
                           return (
                             <a
                               href={media.url}
@@ -105,12 +139,66 @@ export default function ChatWindow({ messages, user, loadMore, hasMore, isFetchi
                   ))}
                 </div>
                 <div
-                  className={classNames('flex mb-2', {
+                  className={classNames('flex mb-2 relative', {
                     'justify-end': message.sender_id == user?._id,
                     'justify-start': !(message.sender_id == user?._id)
                   })}
                 >
-                  <div className='bg-blue-500 text-white p-2 rounded-full'>{message.content}</div>
+                  <div
+                    title={formatDate(message.created_at as string)}
+                    className='bg-blue-500 text-white p-2 rounded-lg cursor-pointer max-w-xs break-words relative group'
+                  >
+                    <button
+                      className={classNames(
+                        'absolute -top-2  text-white rounded-lg w-6 h-6 flex items-center justify-center',
+                        {
+                          '-left-8': message.sender_id == user?._id, // Tin nhắn của mình: "..." ở bên trái
+                          '-right-8': !(message.sender_id == user?._id) // Tin nhắn của người khác: "..." ở bên phải
+                        }
+                      )}
+                      onClick={() => handleOptionsClick(message._id)}
+                    >
+                      ...
+                    </button>
+
+                    {message.content}
+
+                    {/* Menu tùy chọn */}
+                    {activeMessageOptions === message._id && (
+                      <div
+                        className={classNames(
+                          'absolute z-10 bg-black border border-white shadow-lg rounded p-2 w-32 mt-1',
+                          {
+                            '-left-40 top-0': message.sender_id == user?._id,
+                            '-right-40 top-0': !(message.sender_id == user?._id)
+                          }
+                        )}
+                      >
+                        <ul>
+                          {message.sender_id == user?._id && (
+                            <li
+                              className='text-red-500 hover:bg-gray-700 hover:text-red-400 p-1 rounded cursor-pointer text-sm'
+                              onClick={() => handleDeleteMessage(message._id)}
+                            >
+                              Unsend
+                            </li>
+                          )}
+                          <li
+                            className='text-gray-700 hover:bg-gray-700 hover:text-white p-1 rounded cursor-pointer text-sm'
+                            onClick={() => handleShareMessage(message)}
+                          >
+                            Share
+                          </li>
+                          <li
+                            className='text-gray-700 hover:bg-gray-700 hover:text-white p-1 rounded cursor-pointer text-sm'
+                            onClick={() => handleReplyMessage(message)}
+                          >
+                            Reply
+                          </li>
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

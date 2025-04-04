@@ -28,7 +28,7 @@ export default function ConversationsList({
           })}
           onClick={() => onSelectUser(user)}
         >
-          <img alt='User avatar' className='rounded-full' height={40} src='https://placehold.co/40x40' width={40} />
+          <img alt='User avatar' className='rounded-full' height={40} src={user.avatar} width={40} />
           <div>
             <div className='font-bold'>{user.name}</div>
             <div className='text-gray-500'>13 thg 4, 2023</div>
