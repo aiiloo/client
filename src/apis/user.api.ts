@@ -1,11 +1,11 @@
 import { AuthResponse } from '../types/auth.type'
-import { EmailVerify, LogoutType, RefreshTokenType, ProfileUser } from '../types/user.type'
+import { EmailVerify, LogoutType, RefreshTokenType, ProfileUser, SearchUser } from '../types/user.type'
 import http from '../utils/http'
 import { LoginType, RegisterType } from '../utils/rules'
 
 const userApi = {
   register(body: RegisterType) {
-    return http.post('/users/register', body)
+    return http.post<AuthResponse>('/users/register', body)
   },
   login(body: LoginType) {
     return http.post<AuthResponse>('/users/login', body)
@@ -30,6 +30,9 @@ const userApi = {
         'Content-Type': 'multipart/form-data'
       }
     })
+  },
+  search(body: SearchUser) {
+    return http.post('/users/search', body)
   }
 }
 
