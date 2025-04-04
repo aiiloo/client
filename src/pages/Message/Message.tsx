@@ -14,6 +14,7 @@ import ConversationsList from './components/ConversationList'
 import ChatWindow from './components/ChatWindow'
 import ChatInput from './components/ChatInput'
 import { toast } from 'react-toastify'
+import ChatWindowHeader from './components/ChatWindowHeader'
 
 const LIMIT = 5
 const PAGE = 1
@@ -295,17 +296,8 @@ export default function Chat() {
           <div className='w-full h-full lg:w-2/3 flex flex-col'>
             {selectedUser !== null ? (
               <>
-                {' '}
-                <div className='flex items-center p-4 border-b border-gray-700'>
-                  <img
-                    alt='User profile picture'
-                    className='rounded-full'
-                    height={40}
-                    src='https://placehold.co/40x40'
-                    width={40}
-                  />
-                  <div className='ml-4 font-bold'>{selectedUser.name}</div>
-                </div>
+                <ChatWindowHeader selectedUser={selectedUser} />
+
                 <ChatWindow
                   messages={messages}
                   user={user}
