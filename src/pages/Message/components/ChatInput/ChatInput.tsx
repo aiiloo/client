@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
 
-// Import các biểu tượng cơ bản
 import mp4Icon from '../../../../assets/icons/mp4.png'
 import mp3Icon from '../../../../assets/icons/mp3.png'
 import pdfIcon from '../../../../assets/icons/pdf-file.png'
@@ -32,15 +31,15 @@ export default function ChatInput({
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResults, setSearchResults] = useState<EmojiData[]>([])
   const [recentEmojis, setRecentEmojis] = useState<string[]>(['😀', '😂', '❤️', '👍', '🔥', '🎉', '👏', '🙏'])
+  const [wordCount, setWordCount] = useState(0)
+  const MAX_WORDS = 150
 
-  // Hàm reset input file khi click chọn file
   const handleFileClick = () => {
     if (fileInputRef.current) {
       ;(fileInputRef.current as HTMLInputElement).value = ''
     }
   }
 
-  // Hàm tìm kiếm emoji
   const searchEmojis = (term: string) => {
     if (!term.trim()) {
       setSearchResults([])
@@ -53,31 +52,56 @@ export default function ChatInput({
     setSearchResults(results)
   }
 
-  // Xử lý tìm kiếm khi searchTerm thay đổi
   useEffect(() => {
     searchEmojis(searchTerm)
   }, [searchTerm])
 
-  // Hàm thêm emoji vào input
+  // Hàm đếm số từ trong văn bản
+  const countWords = (text: string): number => {
+    // Loại bỏ khoảng trắng ở đầu và cuối, sau đó tách theo khoảng trắng
+    return text.trim() === '' ? 0 : text.trim().split(/\s+/).length
+  }
+
+  // Cập nhật số từ mỗi khi giá trị thay đổi
+  useEffect(() => {
+    setWordCount(countWords(value))
+  }, [value])
+
+  // Xác thực đầu vào và giới hạn số từ
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newText = e.target.value
+    const newWordCount = countWords(newText)
+
+    // Cho phép xóa hoặc đảm bảo số từ không vượt quá giới hạn
+    if (newWordCount <= MAX_WORDS || newWordCount < wordCount) {
+      onChange(e)
+    }
+  }
+
   const addEmoji = (emoji: string) => {
-    // Thêm vào giá trị input
+    // Kiểm tra xem việc thêm emoji có làm vượt quá giới hạn từ không
     const newValue = value + emoji
-    const simulatedEvent = {
-      target: { value: newValue }
-    } as React.ChangeEvent<HTMLTextAreaElement>
+    const newWordCount = countWords(newValue)
 
-    onChange(simulatedEvent)
+    if (newWordCount <= MAX_WORDS) {
+      // Thêm vào giá trị input
+      const simulatedEvent = {
+        target: { value: newValue }
+      } as React.ChangeEvent<HTMLTextAreaElement>
 
-    // Lưu vào danh sách gần đây
-    if (!recentEmojis.includes(emoji)) {
-      const newRecentEmojis = [emoji, ...recentEmojis.slice(0, 7)]
-      setRecentEmojis(newRecentEmojis)
+      onChange(simulatedEvent)
 
-      // Có thể lưu vào localStorage để giữ lại giữa các phiên
-      try {
-        localStorage.setItem('recentEmojis', JSON.stringify(newRecentEmojis))
-      } catch (error) {
-        console.error('Error saving recent emojis to localStorage:', error)
+      // Lưu vào danh sách gần đây
+      if (!recentEmojis.includes(emoji)) {
+        const newRecentEmojis = [emoji, ...recentEmojis.slice(0, 7)]
+        setRecentEmojis(newRecentEmojis)
+
+        // Có thể lưu vào localStorage để giữ lại giữa các phiên
+        try {
+          localStorage.setItem('recentEmojis', JSON.stringify(newRecentEmojis))
+        } catch (error) {
+          console.error('Error saving recent emojis to localStorage:', error)
+        }
       }
     }
   }
@@ -93,6 +117,16 @@ export default function ChatInput({
       console.error('Error loading recent emojis from localStorage:', error)
     }
   }, [])
+
+  // Xác định màu sắc cho bộ đếm từ
+  const getWordCountColor = () => {
+    if (wordCount > MAX_WORDS * 0.9) {
+      return 'text-red-500'
+    } else if (wordCount > MAX_WORDS * 0.75) {
+      return 'text-yellow-500'
+    }
+    return 'text-gray-400'
+  }
 
   return (
     <form onSubmit={onSend}>
@@ -185,23 +219,30 @@ export default function ChatInput({
             😊
           </button>
 
-          <textarea
-            id='chat'
-            rows={1}
-            className='block mx-4 p-2.5 w-full text-sm text-white bg-black rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-            placeholder='Your message...'
-            onChange={onChange}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault()
-                onSend(e as unknown as React.FormEvent<HTMLFormElement>)
-              }
-            }}
-            value={value}
-          />
+          <div className='relative flex-grow mx-4'>
+            <textarea
+              id='chat'
+              rows={1}
+              className='block p-2.5 w-full text-sm text-white bg-black rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+              placeholder='Your message...'
+              onChange={handleTextChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  onSend(e as unknown as React.FormEvent<HTMLFormElement>)
+                }
+              }}
+              value={value}
+            />
+            {/* Hiển thị số từ ở góc dưới bên phải của textarea */}
+            <div className={`absolute bottom-2 right-2 text-xs ${getWordCountColor()}`}>
+              {wordCount}/{MAX_WORDS}
+            </div>
+          </div>
           <button
             type='submit'
             className='inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600'
+            disabled={wordCount === 0}
           >
             ➤
           </button>

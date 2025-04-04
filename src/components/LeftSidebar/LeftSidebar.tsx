@@ -356,10 +356,7 @@ export default function LeftSidebar() {
             className='flex items-center space-x-2 mt-4 w-full py-1 hover:bg-gray-800  rounded-full '
           >
             <div className='pl-3'>
-              <img
-                className='rounded-full w-8 h-8'
-                src='https://www.hollywoodreporter.com/wp-content/uploads/2012/12/img_logo_blue.jpg'
-              />
+              <img className='rounded-full w-8 h-8' src={user?.avatar} />
             </div>
             <span>{user?.name}</span>
             <div className='pl-3'>
