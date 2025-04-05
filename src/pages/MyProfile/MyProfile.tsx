@@ -12,20 +12,19 @@ export default function MyProfile() {
   const user = useSelector((state: RootState) => state.user.currentUser)
 
   const { data } = useQuery({
-    queryKey: ['userInfo', user?._id],
+    queryKey: ['myInfo', user?._id],
     queryFn: () => {
       return userApi.myProfile()
     }
   })
-  console.log('check data123', data)
 
   return (
     <>
-      <div className='bg-black text-white '>
+      <div className='bg-black text-white border-2 border-solid border-gray-800 '>
         <div className='max-w-screen-sm mx-auto m-sm-50'>
           <div className='bg-gray-900 p-4'>
             <div className='flex items-center justify-between'>
-              <div className='text-xl font-bold'>Bao Pham</div>
+              <div className='text-xl font-bold'>{data?.data.data.name}</div>
               <div className='text-sm'>0 posts</div>
             </div>
           </div>
@@ -82,7 +81,7 @@ export default function MyProfile() {
               <button className='bg-white text-green-700 px-4 py-1 rounded-full'>Get verified</button>
             </div>
           </div>
-          <div className='mt-4'>
+          <div className='mt-4 p-1'>
             <div className='font-bold text-lg'>Let's get you set up</div>
             <div className='flex mt-4 space-x-4'>
               <div className='bg-gradient-to-r from-purple-500 to-pink-500 p-4 rounded-lg text-center'>
@@ -105,7 +104,7 @@ export default function MyProfile() {
               </div>
             </div>
           </div>
-          <div className='mt-4'>
+          <div className='mt-4 p-1'>
             <div className='font-bold text-lg'>Who to follow</div>
             <div className='mt-4'>
               <div className='flex items-center justify-between'>
