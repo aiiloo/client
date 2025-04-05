@@ -19,6 +19,7 @@
     "axios": "^1.8.3",
     "classnames": "^2.5.1",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
     "flowbite-react": "^0.10.2",
     "framer-motion": "^12.5.0",
     "lucide-react": "^0.483.0",
@@ -28,6 +29,7 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.30.0",
+    "react-toastify": "^11.0.5",
     "socket.io-client": "^4.8.1",
     "yup": "^1.6.1"
   },
