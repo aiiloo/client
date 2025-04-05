@@ -31,6 +31,8 @@ const userApi = {
       }
     })
   },
+  yourProfile(username: string) {
+    return http.get(`/users/profile/${username}`)
   search(body: SearchUser) {
     return http.post('/users/search', body)
   }

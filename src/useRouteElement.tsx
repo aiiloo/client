@@ -11,6 +11,10 @@ import { useSelector } from 'react-redux'
 import GoogleAuth from './pages/GoogleOauth'
 import Message from './pages/Message'
 import MyProfile from './pages/MyProfile'
+import Profile from './pages/Profile'
+import YourPost from './components/YourPost'
+// import YourReplies from './components/YourReplies'
+import YourMedia from './components/YourMedia'
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute() {
@@ -44,13 +48,7 @@ export default function useRouteElement() {
               <Message />
             </MainLayout>
           )
-        }
-      ]
-    },
-    {
-      path: '',
-      element: <ProtectedRoute />,
-      children: [
+        },
         {
           path: '/my-profile',
           element: (
@@ -58,6 +56,28 @@ export default function useRouteElement() {
               <MyProfile />
             </MainLayout>
           )
+        },
+        {
+          path: '/profile/:username',
+          element: (
+            <MainLayout>
+              <Profile />
+            </MainLayout>
+          ),
+          children: [
+            {
+              path: '',
+              element: <YourPost />
+            },
+            // {
+            //   path: 'with_replies',
+            //   element: <YourReplies />
+            // },
+            {
+              path: 'media',
+              element: <YourMedia />
+            }
+          ]
         }
       ]
     },
