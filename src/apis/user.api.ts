@@ -30,6 +30,9 @@ const userApi = {
         'Content-Type': 'multipart/form-data'
       }
     })
+  },
+  yourProfile(username: string) {
+    return http.get(`/users/profile/${username}`)
   }
 }
 

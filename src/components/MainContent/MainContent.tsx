@@ -372,14 +372,10 @@ export default function MainContent() {
               return (
                 <div key={`post-${index}`} className='p-4 border-b border-gray-700'>
                   <div className=' flex items-center space-x-2'>
-                    <img
-                      alt='User profile picture'
-                      className='rounded-full w-10 h-10'
-                      src={`http://localhost:4000/assets/images/${item.user.avatar}`}
-                    />
+                    <img alt='User profile picture' className='rounded-full w-10 h-10' src={item.user.avatar} />
                     <div>
                       <span className='font-bold'>{item.user.name}</span>
-                      <span className='text-gray-500'>{item.user.username}</span>
+                      <span className='text-gray-500 ml-1'>@{item.user.username}</span>
                     </div>
                   </div>
                   <p className='mt-2'>{item.content}</p>
@@ -395,6 +391,7 @@ export default function MainContent() {
                       )
                     return (
                       <video
+                        key={`media-${index}`}
                         className='w-full h-full max-w-[516px] max-h-[516px] object-contain mt-1'
                         src={`http://localhost:4000/assets/images/${media.url}`}
                         controls

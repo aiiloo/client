@@ -8,6 +8,9 @@ const postApi = {
   },
   getAllPost() {
     return http.get('/posts/all-post')
+  },
+  getYourPost(username: string) {
+    return http.get(`/posts/your-post/${username}`)
   }
 }
 
