@@ -2,8 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { SearchUser, User } from '../../types/user.type'
 import userApi from '../../apis/user.api'
 import { useState, useRef, useEffect } from 'react'
-
-const SERVER_URL = import.meta.env.VITE_URL_SERVER
+import { Link } from 'react-router-dom'
 
 export default function RightSidebar() {
   const [searchInput, setSearchInput] = useState('')
@@ -75,12 +74,13 @@ export default function RightSidebar() {
                   <div className='max-h-72 overflow-y-auto'>
                     <ul className='space-y-2'>
                       {searchResults.map((user) => (
-                        <li
+                        <Link
+                          to={`/profile/${user.username}`}
                           key={user._id}
                           className='flex items-center space-x-2 p-2 hover:bg-gray-800 rounded-lg cursor-pointer'
                         >
                           <img
-                            src={SERVER_URL + '/assets/images/' + user.avatar || 'https://placehold.co/40x40'}
+                            src={user.avatar || 'https://placehold.co/40x40'}
                             className='rounded-full w-10 h-10'
                             alt={user.name}
                           />
@@ -88,7 +88,7 @@ export default function RightSidebar() {
                             <p className='font-medium'>{user.name}</p>
                             {user.username && <p className='text-gray-500 text-sm'>@{user.username}</p>}
                           </div>
-                        </li>
+                        </Link>
                       ))}
                     </ul>
                   </div>
