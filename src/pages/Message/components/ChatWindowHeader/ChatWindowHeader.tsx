@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Video,
   Phone,
@@ -12,6 +12,21 @@ import {
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { User } from '../../../../types/user.type'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import conversationApi from '../../../../apis/conversation.api'
+import pdfIcon from '../../../../assets/icons/pdf-file.png'
+import docIcon from '../../../../assets/icons/doc.png'
+import excelIcon from '../../../../assets/icons/excel-file.png'
+
+const fileIcons = {
+  pdf: pdfIcon,
+  doc: docIcon,
+  docx: docIcon,
+  xls: excelIcon,
+  xlsx: excelIcon,
+  ppt: excelIcon,
+  pptx: excelIcon
+}
 
 export default function ChatWindowHeader({ selectedUser }: { selectedUser: User | null }) {
   const [showSidebar, setShowSidebar] = useState(false)
@@ -19,6 +34,24 @@ export default function ChatWindowHeader({ selectedUser }: { selectedUser: User 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [privacyStatus, setPrivacyStatus] = useState<'none' | 'restricted' | 'blocked' | 'reported'>('none')
 
+  const { data: conversationMedias } = useQuery({
+    queryKey: ['conversation-medias', selectedUser?._id],
+    queryFn: () => {
+      return conversationApi.getConversationMedias({
+        receiver_user_id: selectedUser?._id as string,
+        type: showContentSidebar as string,
+        limit: 10,
+        page: 1
+      })
+    },
+    enabled: !!selectedUser && !!showContentSidebar,
+
+    placeholderData: keepPreviousData
+  })
+
+  useEffect(() => {
+    console.log('conversationMedias', conversationMedias)
+  }, [conversationMedias])
   const toggleSidebar = () => setShowSidebar(!showSidebar)
   const toggleNotifications = () => setNotificationsEnabled(!notificationsEnabled)
 
@@ -122,7 +155,7 @@ export default function ChatWindowHeader({ selectedUser }: { selectedUser: User 
                 </button>
                 <button
                   className='flex items-center justify-start gap-2 py-2 px-4 bg-[#333] rounded-md hover:bg-[#444] transition'
-                  onClick={() => openContentSidebar('file')}
+                  onClick={() => openContentSidebar('document')}
                 >
                   <FileIcon className='w-5 h-5' />
                   <span>Files</span>
@@ -184,7 +217,7 @@ export default function ChatWindowHeader({ selectedUser }: { selectedUser: User 
               <h2 className='text-lg font-semibold'>
                 {showContentSidebar === 'image' && 'Images'}
                 {showContentSidebar === 'video' && 'Videos'}
-                {showContentSidebar === 'file' && 'Files'}
+                {showContentSidebar === 'document' && 'Documents'}
                 {showContentSidebar === 'audio' && 'Audio'}
               </h2>
               <button onClick={closeContentSidebar} className='text-gray-400 hover:text-gray-600'>
@@ -198,13 +231,13 @@ export default function ChatWindowHeader({ selectedUser }: { selectedUser: User 
               {showContentSidebar === 'image' && (
                 <div className='grid grid-cols-3 gap-4 max-h-[calc(100vh-150px)] overflow-y-auto'>
                   {/* Loop through 20 sample images */}
-                  {Array.from({ length: 20 }).map((_, index) => (
-                    <div key={index} className='mb-4'>
-                      <img
-                        src={`https://placehold.co/300x300?text=Image+${index + 1}`}
-                        alt={`Image ${index + 1}`}
-                        className='rounded-lg w-full'
-                      />
+                  {conversationMedias?.data.data.map((media, index) => (
+                    <div key={index}>
+                      {media.medias?.map((image: any, i: number) => (
+                        <div key={i} className='mb-4'>
+                          <img src={image.url} alt={`Image ${i + 1}`} className='rounded-lg w-full' />
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
@@ -212,42 +245,65 @@ export default function ChatWindowHeader({ selectedUser }: { selectedUser: User 
 
               {/* Display videos in a grid */}
               {showContentSidebar === 'video' && (
-                <div className='grid grid-cols-3 gap-4 max-h-[calc(100vh-150px)] overflow-y-auto'>
+                <div className='grid grid-cols-2 gap-4 max-h-[calc(100vh-150px)] overflow-y-auto'>
                   {/* Loop through 6 sample videos */}
-                  {Array.from({ length: 16 }).map((_, index) => (
-                    <div key={index} className='mb-4'>
-                      <video className='w-full' controls>
-                        <source src='https://www.w3schools.com/html/movie.mp4' type='video/mp4' />
-                      </video>
+                  {conversationMedias?.data.data.map((media, index) => (
+                    <div key={index}>
+                      {media.medias?.map((data: any, i: number) => (
+                        <div key={i} className='mb-4'>
+                          <video controls className=' rounded-lg w-full'>
+                            <source src={data.url} type='video/mp4' />
+                          </video>
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
               )}
 
               {/* Display file links */}
-              {showContentSidebar === 'file' && (
+              {showContentSidebar === 'document' && (
                 <div>
                   <ul className='space-y-2'>
-                    <li>
-                      <a href='#' className='text-blue-400 hover:underline'>
-                        invoice_123.pdf
-                      </a>
-                    </li>
-                    <li>
-                      <a href='#' className='text-blue-400 hover:underline'>
-                        list.xlsx
-                      </a>
-                    </li>
+                    {conversationMedias?.data.data.map((media, index) => (
+                      <li key={index}>
+                        {media.medias?.map((file: any, i: number) => (
+                          <a
+                            key={i}
+                            href={file.url}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='flex items-center gap-2 bg-gray-200 p-2 rounded-lg mt-2 text-blue-500 hover:text-blue-700'
+                          >
+                            <img
+                              src={fileIcons[file.name?.split('.').pop()?.toLowerCase() as keyof typeof fileIcons]}
+                              alt='File Icon'
+                              className='w-6 h-6'
+                            />
+                            <span className='truncate'>{file.name || 'Tài liệu'}</span>
+                          </a>
+                        ))}
+                      </li>
+                    ))}
                   </ul>
                 </div>
               )}
 
               {/* Display audio */}
               {showContentSidebar === 'audio' && (
-                <div>
-                  <audio controls>
-                    <source src='https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' />
-                  </audio>
+                <div className='grid grid-cols-2 gap-4 max-h-[calc(100vh-150px)] overflow-y-auto'>
+                  {/* Loop through 6 sample videos */}
+                  {conversationMedias?.data.data.map((media, index) => (
+                    <div key={index}>
+                      {media.medias?.map((data: any, i: number) => (
+                        <div key={i} className='mb-4' title={data.name}>
+                          <audio controls className=' rounded-lg w-full'>
+                            <source src={data.url} />
+                          </audio>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
