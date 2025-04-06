@@ -1,7 +1,12 @@
 import { AuthResponse } from '../types/auth.type'
-import { EmailVerify, LogoutType, RefreshTokenType, ProfileUser, SearchUser } from '../types/user.type'
+import { EmailVerify, LogoutType, RefreshTokenType, ProfileUser, SearchUser, User } from '../types/user.type'
+import { SuccessResponse } from '../types/utils.type'
 import http from '../utils/http'
 import { LoginType, RegisterType } from '../utils/rules'
+
+interface UserWithFollow extends User {
+  isFollow?: boolean
+}
 
 const userApi = {
   register(body: RegisterType) {
@@ -32,7 +37,7 @@ const userApi = {
     })
   },
   yourProfile(username: string) {
-    return http.get(`/users/profile/${username}`)
+    return http.get<SuccessResponse<UserWithFollow>>(`/users/profile/${username}`)
   },
   search(body: SearchUser) {
     return http.post('/users/search', body)
