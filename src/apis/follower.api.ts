@@ -13,6 +13,12 @@ const followerApi = {
     return http.get<SuccessResponse<FollowerItem[]>>(
       `/followers/mutual-followers/?limit=${body.limit}&page=${body.page}`
     )
+  },
+  addFollower(body: { follower_user_id: string }) {
+    return http.post('/followers/add-follower', body)
+  },
+  removeFollower(body: { follower_user_id: string }) {
+    return http.delete('/followers/remove-follower', { data: body })
   }
 }
 

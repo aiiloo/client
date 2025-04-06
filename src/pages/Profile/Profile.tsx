@@ -1,15 +1,18 @@
+import { motion } from 'framer-motion'
 import { Link, useParams } from 'react-router-dom'
 import RightSidebar from '../../components/RightSidebar'
 import userApi from '../../apis/user.api'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { NavLink, Outlet } from 'react-router-dom'
 import classNames from 'classnames'
-import { useMemo } from 'react'
+import followerApi from '../../apis/follower.api'
+import Button from '../../components/Button'
+import { useState } from 'react'
 
 export default function Profile() {
   const { username } = useParams()
-
+  const [showSuccess, setShowSuccess] = useState(false)
   const { data } = useQuery({
     queryKey: ['userInfo', username],
     queryFn: () => {
@@ -17,9 +20,53 @@ export default function Profile() {
     }
   })
 
+  const followMutation = useMutation({
+    mutationFn: (body: { follower_user_id: string }) => followerApi.addFollower(body)
+  })
+
+  const unFollowMutation = useMutation({
+    mutationFn: (body: { follower_user_id: string }) => followerApi.removeFollower(body)
+  })
+
   const queryClient = useQueryClient()
   const totalPost = queryClient.getQueryData(['your-post', username])
 
+  const handleFollow = () => {
+    followMutation.mutate(
+      {
+        follower_user_id: data?.data.data._id as string
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['userInfo', username] })
+          setShowSuccess(true)
+
+          setTimeout(() => {
+            setShowSuccess(false)
+          }, 1000)
+        },
+        onError: (error) => {
+          console.log(error)
+        }
+      }
+    )
+  }
+
+  const handleUnFollow = () => {
+    unFollowMutation.mutate(
+      {
+        follower_user_id: data?.data.data._id as string
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['userInfo', username] })
+        },
+        onError: (error) => {
+          console.log(error)
+        }
+      }
+    )
+  }
   return (
     <>
       <div className='max-w-2xl xl:min-w-[700px] mx-auto border-2 border-solid border-gray-800'>
@@ -98,9 +145,24 @@ export default function Profile() {
                 />
               </svg>
             </button>
-            <button className='bg-blue-500 text-white px-4 py-2 rounded-full font-bold hover:bg-blue-600'>
-              Follow
-            </button>
+
+            {data?.data.data.isFollow ? (
+              <Button
+                className=' text-white px-4 py-2 border border-blue-500 rounded-full font-bold hover:bg-blue-900'
+                onClick={handleUnFollow}
+                disabled={unFollowMutation.isPending}
+              >
+                Unfollow
+              </Button>
+            ) : (
+              <Button
+                className='bg-blue-500 text-white px-4 py-2 rounded-full font-bold hover:bg-blue-600'
+                onClick={handleFollow}
+                disabled={followMutation.isPending}
+              >
+                Follow
+              </Button>
+            )}
           </div>
         </div>
         {/* Profile Info */}
@@ -236,6 +298,17 @@ export default function Profile() {
         </div>
         {/* Post */}
         <Outlet />
+        {showSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className='fixed top-10 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg'
+          >
+            🎉 Follow SuccessFully!
+          </motion.div>
+        )}
       </div>
       <RightSidebar />
     </>
