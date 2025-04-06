@@ -6,6 +6,7 @@ import pdfIcon from '../../../../assets/icons/pdf-file.png'
 import docIcon from '../../../../assets/icons/doc.png'
 import excelIcon from '../../../../assets/icons/excel-file.png'
 import { allEmojisWithDescriptions, emojiCategories, EmojiData, emojisByCategory } from '../../../../assets/ts/icons'
+import Button from '../../../../components/Button'
 
 interface Props {
   value: string
@@ -14,7 +15,10 @@ interface Props {
   files: File[]
   handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   removeFile: (index: number) => void
-  uploadPending: boolean
+  uploadImagesPending: boolean
+  uploadVideosPending: boolean
+  uploadAudiosPending: boolean
+  uploadFilesPending: boolean
 }
 export default function ChatInput({
   value,
@@ -23,7 +27,10 @@ export default function ChatInput({
   files,
   handleFileChange,
   removeFile,
-  uploadPending
+  uploadImagesPending,
+  uploadVideosPending,
+  uploadAudiosPending,
+  uploadFilesPending
 }: Props) {
   const fileInputRef = useRef(null)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
@@ -143,7 +150,7 @@ export default function ChatInput({
                       alt='preview'
                       className='w-full h-full object-cover rounded-lg'
                     />
-                    {uploadPending && (
+                    {uploadImagesPending && (
                       <div className='absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 rounded-lg'>
                         <div className='animate-spin border-4 border-t-4 border-blue-600 rounded-full w-8 h-8'></div>
                       </div>
@@ -239,13 +246,14 @@ export default function ChatInput({
               {wordCount}/{MAX_WORDS}
             </div>
           </div>
-          <button
+          <Button
             type='submit'
             className='inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600'
-            disabled={wordCount === 0}
+            isLoading={uploadImagesPending || uploadVideosPending || uploadFilesPending || uploadAudiosPending}
+            disabled={uploadImagesPending || uploadVideosPending || uploadFilesPending || uploadAudiosPending}
           >
             ➤
-          </button>
+          </Button>
         </div>
 
         {/* Emoji picker mở rộng với tìm kiếm */}
