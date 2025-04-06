@@ -312,7 +312,10 @@ export default function Chat() {
                   files={files}
                   handleFileChange={handleFileChange}
                   removeFile={removeFile}
-                  uploadPending={uploadImagesMutation.isPending}
+                  uploadImagesPending={uploadImagesMutation.isPending}
+                  uploadVideosPending={uploadVideoMutation.isPending}
+                  uploadAudiosPending={uploadAudioMutation.isPending}
+                  uploadFilesPending={uploadFileMutation.isPending}
                 />
               </>
             ) : (

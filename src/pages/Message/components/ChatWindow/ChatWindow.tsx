@@ -77,7 +77,7 @@ export default function ChatWindow({
       <div
         id='scrollableDiv'
         style={{
-          height: 500,
+          height: 'calc(100vh - 228px)',
           overflow: 'auto',
           display: 'flex',
           flexDirection: 'column-reverse',
