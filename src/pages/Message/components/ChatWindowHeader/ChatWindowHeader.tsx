@@ -17,6 +17,11 @@ import conversationApi from '../../../../apis/conversation.api'
 import pdfIcon from '../../../../assets/icons/pdf-file.png'
 import docIcon from '../../../../assets/icons/doc.png'
 import excelIcon from '../../../../assets/icons/excel-file.png'
+import { useVoiceCall } from '../../../../hooks/useVoiceCall'
+import { useSelector } from 'react-redux'
+import { RootState } from '../../../../store'
+import ReceiveCallDialog from '../ReceiveCallDialog'
+import CallDialog from '../CallDialog'
 
 const fileIcons = {
   pdf: pdfIcon,
@@ -33,7 +38,9 @@ export default function ChatWindowHeader({ selectedUser }: { selectedUser: User 
   const [showContentSidebar, setShowContentSidebar] = useState<string | null>(null)
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [privacyStatus, setPrivacyStatus] = useState<'none' | 'restricted' | 'blocked' | 'reported'>('none')
-
+  const { startCall } = useVoiceCall()
+  const currentUser = useSelector((state: RootState) => state.user.currentUser)
+  const callState = useSelector((state: RootState) => state.call)
   const { data: conversationMedias } = useQuery({
     queryKey: ['conversation-medias', selectedUser?._id],
     queryFn: () => {
@@ -49,9 +56,6 @@ export default function ChatWindowHeader({ selectedUser }: { selectedUser: User 
     placeholderData: keepPreviousData
   })
 
-  useEffect(() => {
-    console.log('conversationMedias', conversationMedias)
-  }, [conversationMedias])
   const toggleSidebar = () => setShowSidebar(!showSidebar)
   const toggleNotifications = () => setNotificationsEnabled(!notificationsEnabled)
 
@@ -60,6 +64,14 @@ export default function ChatWindowHeader({ selectedUser }: { selectedUser: User 
 
   const handlePrivacyChange = (status: 'restricted' | 'blocked' | 'reported') => {
     setPrivacyStatus(status)
+  }
+
+  // Xử lý khi nhấn nút gọi thoại
+  const handleVoiceCall = () => {
+    if (selectedUser?._id) {
+      console.log('Calling', selectedUser._id)
+      startCall({ receiverId: selectedUser._id, receiverInfo: selectedUser, callerInfo: currentUser as User })
+    }
   }
 
   return (
@@ -78,7 +90,7 @@ export default function ChatWindowHeader({ selectedUser }: { selectedUser: User 
 
         <div className='flex items-center gap-4'>
           <button title='Voice Call'>
-            <Phone className='w-5 h-5 hover:text-green-500 transition' />
+            <Phone className='w-5 h-5 hover:text-green-500 transition' onClick={handleVoiceCall} />
           </button>
           <button title='Video Call'>
             <Video className='w-5 h-5 hover:text-blue-500 transition' />
@@ -88,6 +100,18 @@ export default function ChatWindowHeader({ selectedUser }: { selectedUser: User 
           </button>
         </div>
       </div>
+      <audio id='remoteAudio' autoPlay style={{ display: 'none' }} />
+      {/* {outgoingCall && (
+        <div className='call-dialog caller'>
+          <h3>Đang gọi {selectedUser?.name}</h3>
+          <img src={selectedUser?.avatar || 'https://placehold.co/40x40'} alt='Receiver' />
+          <button onClick={cancelCall}>Hủy</button>
+        </div>
+      )} */}
+      {(callState.outgoingCall || (callState.isCaller && callState.inCall)) && <CallDialog />}
+      {((callState.incomingCall && !callState.inCall) || (callState.inCall && !callState.isCaller)) && (
+        <ReceiveCallDialog />
+      )}
 
       {/* Main Sidebar */}
       <AnimatePresence>
@@ -201,7 +225,6 @@ export default function ChatWindowHeader({ selectedUser }: { selectedUser: User 
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Content Sidebar (Images, Videos, Files, Audio) */}
       <AnimatePresence>
         {showContentSidebar && (

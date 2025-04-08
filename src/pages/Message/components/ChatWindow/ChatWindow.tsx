@@ -146,14 +146,20 @@ export default function ChatWindow({
                 >
                   <div
                     title={formatDate(message.created_at as string)}
-                    className='bg-blue-500 text-white p-2 rounded-lg cursor-pointer max-w-xs break-words relative group'
+                    className={classNames(
+                      ' text-white p-2 rounded-lg cursor-pointer max-w-xs break-words relative group',
+                      {
+                        'bg-blue-500': message.content != '',
+                        'bg-black': message.content == ''
+                      }
+                    )}
                   >
                     <button
                       className={classNames(
                         'absolute -top-2  text-white rounded-lg w-6 h-6 flex items-center justify-center',
                         {
-                          '-left-8': message.sender_id == user?._id, // Tin nhắn của mình: "..." ở bên trái
-                          '-right-8': !(message.sender_id == user?._id) // Tin nhắn của người khác: "..." ở bên phải
+                          '-left-8': message.sender_id == user?._id,
+                          '-right-8': !(message.sender_id == user?._id)
                         }
                       )}
                       onClick={() => handleOptionsClick(message._id)}
@@ -161,7 +167,11 @@ export default function ChatWindow({
                       ...
                     </button>
 
-                    {message.content}
+                    {message.status != 'recalled' ? (
+                      message.content
+                    ) : (
+                      <span className='italic'>This message was deleted</span>
+                    )}
 
                     {/* Menu tùy chọn */}
                     {activeMessageOptions === message._id && (
