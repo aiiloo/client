@@ -8,6 +8,9 @@ const conversationApi = {
     return http.get(
       `/conversations/conversation-medias/${body.receiver_user_id}?limit=${body.limit}&page=${body.page}&type=${body.type}`
     )
+  },
+  recallMessage(body: { conversation_id: string }) {
+    return http.patch(`/conversations/status/${body.conversation_id}`)
   }
 }
 
