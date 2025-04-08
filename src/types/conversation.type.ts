@@ -2,6 +2,7 @@ export interface MessageType {
   _id: string
   content: string
   sender_id: string
+  status?: string
   medias: MediaConversationType[]
   receiver_id: string
   created_at?: string

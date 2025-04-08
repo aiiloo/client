@@ -9,6 +9,8 @@ import { Provider } from 'react-redux'
 import './index.css'
 import App from './App.tsx'
 import { store } from './store.ts'
+import { SocketProvider } from './context/SocketContext.tsx'
+import { VoiceCallProvider } from './context/VoiceCallContext.tsx'
 
 const queryClient = new QueryClient()
 createRoot(document.getElementById('root')!).render(
@@ -16,7 +18,11 @@ createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
-        <App />
+        <SocketProvider>
+          <VoiceCallProvider>
+            <App />
+          </VoiceCallProvider>
+        </SocketProvider>
         <ToastContainer />
       </Provider>
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}

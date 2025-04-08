@@ -73,20 +73,25 @@ export default function Chat() {
     mutationFn: (body: { filePath: string; type: string }) => mediaApi.removeFile(body)
   })
 
+  const unSendMessageMutation = useMutation({
+    mutationFn: (body: { conversation_id: string }) => conversationApi.recallMessage(body)
+  })
+
   const dispatch = useDispatch()
   useEffect(() => {
-    socket.auth = {
-      _id: user?._id
-    }
-    socket.connect()
+    // socket.auth = {
+    //   _id: user?._id
+    // }
+    // socket.connect()
     socket.on('receive_message', (data) => {
       console.log('SuperIDO: ', data)
       const { payload } = data
       setMessages((prev) => [payload, ...prev])
     })
-    return () => {
-      socket.disconnect()
-    }
+
+    // return () => {
+    //   socket.disconnect()
+    // }
   }, [user])
 
   useEffect(() => {
@@ -132,7 +137,6 @@ export default function Chat() {
 
     setFileStore([])
     setFiles([])
-    // refetch()
   }
 
   const selectUserToChat = (newUser: User) => {
@@ -282,6 +286,31 @@ export default function Chat() {
     )
   }
 
+  const handleUnsendMessage = (conversationId: string) => {
+    if (selectedUser) {
+      unSendMessageMutation.mutate(
+        { conversation_id: conversationId },
+        {
+          onSuccess: () => {
+            setMessages((prev) =>
+              prev.map((message) => {
+                if (message._id === conversationId) {
+                  return {
+                    ...message,
+                    content: '',
+                    medias: [],
+                    status: 'recalled'
+                  }
+                }
+                return message
+              })
+            )
+          }
+        }
+      )
+    }
+  }
+
   return (
     <>
       <div className='w-full lg:ml-[25%] flex flex-col'>
@@ -304,6 +333,7 @@ export default function Chat() {
                   loadMore={loadMore}
                   hasMore={page < conversations?.data?.data?.total_pages}
                   isFetching={isFetching}
+                  onDeleteMessage={handleUnsendMessage}
                 />
                 <ChatInput
                   value={value}
